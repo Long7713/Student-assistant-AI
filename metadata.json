@@ -1,0 +1,6 @@
+{
+  "name": "AI Student Assistant",
+  "description": "Intelligent university study planner that optimizes your daily focus around fixed classes, deadlines, and automatically adapts when plans change.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}
