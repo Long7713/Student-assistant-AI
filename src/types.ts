@@ -66,18 +66,18 @@ export interface Task {
   subtasks?: Subtask[];
   createdAt: string;
 }
-
 export interface StudySession {
   id: string;
-  taskId: string;
-  date: string; // "YYYY-MM-DD"
-  startTime: string; // "14:00"
-  endTime: string;   // "15:30"
+  taskId?: string;
+  courseId?: string;
+  date: string;
+  startTime: string;
+  endTime: string;
   durationMinutes: number;
   status: SessionStatus;
   goal: string;
   missedReason?: string;
-  replanTag?: string; // e.g. "Moved from 10:00 AM", "Rescheduled"
+  replanTag?: string;
 }
 
 export interface SessionChange {
