@@ -80,12 +80,12 @@ Role	Responsibility
 >AI Planner có thể chạy độc lập với UI
 
 ## 👑 Leader
- Kiểm tra GitHub
- Chuẩn hóa README
- Phân chia branch cho 2 Dev
- Kiểm tra .gitignore
- Kiểm tra .env.example
- Đảm bảo API key không bị push lên GitHub
+- [ ] Kiểm tra GitHub
+- [ ] Chuẩn hóa README
+- [ ] Phân chia branch cho 2 Dev
+- [ ] Kiểm tra .gitignore
+- [ ] Kiểm tra .env.example
+- [ ] Đảm bảo API key không bị push lên GitHub
 # 🟡 DAY 2 — COURSE & TASK SYSTEM
 - [ ] Hoàn thiện Add Course
 - [ ] Edit Course
@@ -114,13 +114,11 @@ User Data
     ↓
 Planner Input
 # 🔵 DAY 3 — CALENDAR & PLAN GENERATION
-## 💻 Dev 1
 - [ ] Hiển thị Course trên Calendar
 - [ ] Hiển thị Task
 - [ ] Hiển thị Deadline
 - [ ] Hiển thị Study Session
 - [ ] Kiểm tra responsive mobile
-## 🤖 Dev 2
 - [ ] Tạo thuật toán ưu tiên Task
 - [ ] Ưu tiên Deadline gần
 - [ ] Ưu tiên Task quan trọng
