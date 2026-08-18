@@ -28,13 +28,13 @@ AI Student Assistant không phải là một chatbot giải bài tập.
 
 Mục tiêu của sản phẩm là giúp sinh viên:
 
-📅 Quản lý lịch học và thời gian rảnh
-✅ Theo dõi bài tập và deadline
-🧠 Xác định việc quan trọng nhất cần làm
-🤖 Tự động xây dựng kế hoạch học tập
-🔄 Tự điều chỉnh kế hoạch khi người dùng bỏ lỡ một phiên học
-💬 Giải thích tại sao AI lại thay đổi lịch
-⭐ Core Value
+- [ ]📅 Quản lý lịch học và thời gian rảnh
+- [ ]✅ Theo dõi bài tập và deadline
+- [ ]🧠 Xác định việc quan trọng nhất cần làm
+- [ ]🤖 Tự động xây dựng kế hoạch học tập
+- [ ]🔄 Tự điều chỉnh kế hoạch khi người dùng bỏ lỡ một phiên học
+- [ ]💬 Giải thích tại sao AI lại thay đổi lịch
+>⭐ Core Value
 Student misses a study session
             ↓
 System detects the disruption
@@ -47,8 +47,8 @@ Student receives a new actionable plan
 👥 Team Structure
 Role	Responsibility
 👑 Leader / Product Owner	Product direction, architecture, AI Studio, integration, testing, demo
-💻 Dev 1 — Core & Data	Task, Course, Calendar, State/Data management
-🤖 Dev 2 — AI & Planner	Planning engine, Gemini, Re-plan, AI explanation
+- [ ]💻 Dev 1 — Core & Data	Task, Course, Calendar, State/Data management
+- [ ] 🤖 Dev 2 — AI & Planner	Planning engine, Gemini, Re-plan, AI explanation
 
 ⚠️ Rule: Không ai tự ý thay đổi code core của người khác khi chưa thông báo.
 
@@ -122,18 +122,18 @@ User Data
 Planner Input
 # 🔵 DAY 3 — CALENDAR & PLAN GENERATION
 ## 💻 Dev 1
- Hiển thị Course trên Calendar
- Hiển thị Task
- Hiển thị Deadline
- Hiển thị Study Session
- Kiểm tra responsive mobile
+- [ ] Hiển thị Course trên Calendar
+- [ ] Hiển thị Task
+- [ ] Hiển thị Deadline
+- [ ] Hiển thị Study Session
+- [ ] Kiểm tra responsive mobile
 ## 🤖 Dev 2
- Tạo thuật toán ưu tiên Task
- Ưu tiên Deadline gần
- Ưu tiên Task quan trọng
- Kiểm tra conflict
- Không xếp trùng lịch học
- Generate Study Sessions
+- [ ] Tạo thuật toán ưu tiên Task
+- [ ] Ưu tiên Deadline gần
+- [ ] Ưu tiên Task quan trọng
+- [ ] Kiểm tra conflict
+- [ ] Không xếp trùng lịch học
+- [ ] Generate Study Sessions
 🎯 Deliverable
 ## TASKS
   ↓
@@ -145,20 +145,20 @@ STUDY SESSIONS
 > ⚠️ Đây là ngày quan trọng nhất.
 
 ## 💻 Dev 1
- Kết nối Planner Output vào Calendar
- Hiển thị Study Sessions
- Update UI khi plan thay đổi
- Fix lỗi data synchronization
+- [ ] Kết nối Planner Output vào Calendar
+- [ ] Hiển thị Study Sessions
+- [ ] Update UI khi plan thay đổi
+- [ ] Fix lỗi data synchronization
 ## 🤖 Dev 2
- Kiểm tra Planner Output
- Chuẩn hóa format dữ liệu
- Tạo logic Missed Session
- Tính lại workload còn lại
+- [ ]Kiểm tra Planner Output
+- [ ]Chuẩn hóa format dữ liệu
+- [ ]Tạo logic Missed Session
+- [ ]Tính lại workload còn lại
 ## 👑 Leader
- Merge code Dev 1
- Merge code Dev 2
- Resolve conflict
- Test Core Flow
+- [ ] Merge code Dev 1
+- [ ] Merge code Dev 2
+- [ ] Resolve conflict
+- [ ] Test Core Flow
 ## 🎯 Test
 Add Task
    ↓
@@ -167,17 +167,17 @@ Generate Plan
 Calendar Updated
 # 🟣 DAY 5 — AI RE-PLAN
 ## 💻 Dev 1
- Hoàn thiện nút Hoàn thành
- Hoàn thiện nút Bỏ lỡ
- Hiển thị Re-plan UI
- Hiển thị Before / After
- Hoàn thiện Mobile Bottom Sheet
+- [ ] Hoàn thiện nút Hoàn thành
+- [ ] Hoàn thiện nút Bỏ lỡ
+- [ ] Hiển thị Re-plan UI
+- [ ] Hiển thị Before / After
+- [ ] Hoàn thiện Mobile Bottom Sheet
 ## 🤖 Dev 2
- Phát hiện Missed Session
- Tính workload còn lại
- Tìm thời gian trống
- Recalculate priority
- Generate New Schedule
+- [ ] Phát hiện Missed Session
+- [ ] Tính workload còn lại
+- [ ] Tìm thời gian trống
+- [ ] Recalculate priority
+- [ ] Generate New Schedule
 ## 🎯 Core Flow
 STUDY SESSION
       ↓
@@ -190,19 +190,19 @@ FIND AVAILABLE TIME
 GENERATE NEW PLAN
 # 🤖 DAY 6 — GEMINI + EXPLANATION
 ## 💻 Dev 1
- Hiển thị AI explanation
- Hiển thị lý do Task được di chuyển
- Hiển thị Schedule Changes
- Polish UI
- Fix Mobile UI
+- [ ] Hiển thị AI explanation
+- [ ] Hiển thị lý do Task được di chuyển
+- [ ] Hiển thị Schedule Changes
+- [ ] Polish UI
+- [ ] Fix Mobile UI
 ## 🤖 Dev 2
- Gemini nhận Proposed Schedule
- Gemini giải thích:
- Vì sao task được ưu tiên
- Vì sao task bị dời
- Trade-offs
- Error handling
- Fallback khi Gemini unavailable
+- [ ] Gemini nhận Proposed Schedule
+- [ ] Gemini giải thích:
+- [ ] Vì sao task được ưu tiên
+- [ ] Vì sao task bị dời
+- [ ] Trade-offs
+- [ ] Error handling
+- [ ] Fallback khi Gemini unavailable
 🎯 Deliverable
 NEW PLAN
     ↓
@@ -211,48 +211,50 @@ GEMINI
 "Vì sao AI xếp như vậy?"
 # 🧪 DAY 7 — TESTING & DEMO
 ## 💻 Dev 1
- Fix UI bugs
- Test Add / Edit / Delete
- Test Calendar
- Test Mobile
+- [ ] Fix UI bugs
+- [ ] Test Add / Edit / Delete
+- [ ] Test Calendar
+- [ ] Test Mobile
 ## 🤖 Dev 2
- Test normal schedule
- Test multiple deadlines
- Test missed session
- Test overload
- Test no available time
- Test Gemini unavailable
+- [ ] Test normal schedule
+- [ ] Test multiple deadlines
+- [ ] Test missed session
+- [ ] Test overload
+- [ ] Test no available time
+- [ ] Test Gemini unavailable
 ## 👑 Leader
- End-to-End Testing
- Chuẩn bị demo data
- Chuẩn bị demo scenario
- Review README
- Push final code
- Deploy
- Chuẩn bị presentation
+- [ ] End-to-End Testing
+- [ ] Chuẩn bị demo data
+- [ ] Chuẩn bị demo scenario
+- [ ] Review README
+- [ ] Push final code
+- [ ] Deploy
+- [ ] Chuẩn bị presentation
 # 🏆 FINAL DEMO CHECKLIST
- Add Course
- Add Task
- Generate Study Plan
- Calendar cập nhật
- Start Focus Session
- Mark as Complete
- Mark as Missed
- AI detects disruption
- AI Re-plan
- Gemini explains changes
- Apply New Schedule
- Calendar cập nhật lại
-🚫 NOT NOW — Future Features
+- [ ] Add Course
+- [ ] Add Task
+- [ ] Generate Study Plan
+- [ ] Calendar cập nhật
+- [ ] Start Focus Session
+- [ ] Mark as Complete
+- [ ] Mark as Missed
+- [ ] AI detects disruption
+- [ ] AI Re-plan
+- [ ] Gemini explains changes
+- [ ] Apply New Schedule
+- [ ] Calendar cập nhật lại
+
+
+>🚫 NOT NOW — Future Features
 
 ## ⚠️ Chỉ làm sau khi Core Loop hoạt động hoàn chỉnh.
 
- Event crawler
- Scholarship crawler
- Learning material crawler
- Social features
- Complex gamification
- AI giải bài tập
+- [ ]Event crawler
+- [ ] Scholarship crawler
+- [ ] Learning material crawler
+- [ ] Social features
+- [ ] Complex gamification
+- [ ] AI giải bài tập
 🔥 TEAM RULE
 
 > Không chạy theo số lượng feature.
