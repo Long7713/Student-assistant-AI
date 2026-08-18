@@ -45,10 +45,25 @@ Gemini analyzes and explains the changes
             ↓
 Student receives a new actionable plan
 👥 Team Structure
-Role	Responsibility
-👑 Leader / Product Owner	Product direction, architecture, AI Studio, integration, testing, demo
-- [ ]💻 Dev 1 — Core & Data	Task, Course, Calendar, State/Data management
-- [ ] 🤖 Dev 2 — AI & Planner	Planning engine, Gemini, Re-plan, AI explanation
+Chọn 1 task
+    ↓
+Tạo branch
+    ↓
+Code
+    ↓
+Test local
+    ↓
+Commit
+    ↓
+Push
+    ↓
+Tạo Pull Request
+    ↓
+Người còn lại review
+    ↓
+Merge vào main
+    ↓
+Cả team pull main mới nhất
 
 ⚠️ Rule: Không ai tự ý thay đổi code core của người khác khi chưa thông báo.
 
