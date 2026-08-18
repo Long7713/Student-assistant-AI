@@ -63,8 +63,6 @@ Role	Responsibility
 
 # 🟢 DAY 1 — AUDIT & STABILIZATION
 
-## 💻 Dev 1 — Data & Core
-
 - [ ] Kiểm tra cấu trúc project
 - [ ] Xác định dữ liệu Course
 - [ ] Xác định dữ liệu Task
@@ -72,18 +70,15 @@ Role	Responsibility
 - [ ] Kiểm tra luồng Add Task
 - [ ] Xóa hoặc tách các component dư thừa
 
-### 🎯 Deliverable
+>Course + Task data structure rõ ràng
+- [ ] Kiểm tra Gemini API
+- [ ] Kiểm tra model đang sử dụng
+- [ ] Fix lỗi model không còn hỗ trợ
+- [ ] Kiểm tra logic Re-plan hiện tại
+- [ ] Tách AI logic khỏi UI
+- [ ] Tạo fallback khi Gemini không hoạt động
+>AI Planner có thể chạy độc lập với UI
 
-Course + Task data structure rõ ràng
-## 🤖 Dev 2 — AI & Planner
- Kiểm tra Gemini API
- Kiểm tra model đang sử dụng
- Fix lỗi model không còn hỗ trợ
- Kiểm tra logic Re-plan hiện tại
- Tách AI logic khỏi UI
- Tạo fallback khi Gemini không hoạt động
-🎯 Deliverable
-AI Planner có thể chạy độc lập với UI
 ## 👑 Leader
  Kiểm tra GitHub
  Chuẩn hóa README
@@ -92,16 +87,14 @@ AI Planner có thể chạy độc lập với UI
  Kiểm tra .env.example
  Đảm bảo API key không bị push lên GitHub
 # 🟡 DAY 2 — COURSE & TASK SYSTEM
-## 💻 Dev 1
- Hoàn thiện Add Course
- Edit Course
- Delete Course
- Hoàn thiện Add Task
- Edit Task
- Delete Task
+- [ ] Hoàn thiện Add Course
+- [ ] Edit Course
+- [ ] Delete Course
+- [ ] Hoàn thiện Add Task
+- [ ] Edit Task
+- [ ] Delete Task
 
-### Task cần có:
-
+> Task cần có:
 Task
 ├── Title
 ├── Course
@@ -109,14 +102,14 @@ Task
 ├── Estimated Workload
 ├── Priority
 └── Status
-## 🤖 Dev 2
- Định nghĩa input cho Planner
- Nhận Courses
- Nhận Tasks
- Nhận Deadlines
- Nhận lịch học cố định
- Nhận Available Time
-🎯 Deliverable
+
+- [ ] Định nghĩa input cho Planner
+- [ ] Nhận Courses
+- [ ] Nhận Tasks
+- [ ] Nhận Deadlines
+- [ ] Nhận lịch học cố định
+- [ ] Nhận Available Time
+>🎯 Deliverable
 User Data
     ↓
 Planner Input
@@ -144,12 +137,10 @@ STUDY SESSIONS
 
 > ⚠️ Đây là ngày quan trọng nhất.
 
-## 💻 Dev 1
 - [ ] Kết nối Planner Output vào Calendar
 - [ ] Hiển thị Study Sessions
 - [ ] Update UI khi plan thay đổi
 - [ ] Fix lỗi data synchronization
-## 🤖 Dev 2
 - [ ]Kiểm tra Planner Output
 - [ ]Chuẩn hóa format dữ liệu
 - [ ]Tạo logic Missed Session
@@ -166,13 +157,12 @@ Generate Plan
    ↓
 Calendar Updated
 # 🟣 DAY 5 — AI RE-PLAN
-## 💻 Dev 1
+
 - [ ] Hoàn thiện nút Hoàn thành
 - [ ] Hoàn thiện nút Bỏ lỡ
 - [ ] Hiển thị Re-plan UI
 - [ ] Hiển thị Before / After
 - [ ] Hoàn thiện Mobile Bottom Sheet
-## 🤖 Dev 2
 - [ ] Phát hiện Missed Session
 - [ ] Tính workload còn lại
 - [ ] Tìm thời gian trống
@@ -189,13 +179,11 @@ FIND AVAILABLE TIME
       ↓
 GENERATE NEW PLAN
 # 🤖 DAY 6 — GEMINI + EXPLANATION
-## 💻 Dev 1
 - [ ] Hiển thị AI explanation
 - [ ] Hiển thị lý do Task được di chuyển
 - [ ] Hiển thị Schedule Changes
 - [ ] Polish UI
 - [ ] Fix Mobile UI
-## 🤖 Dev 2
 - [ ] Gemini nhận Proposed Schedule
 - [ ] Gemini giải thích:
 - [ ] Vì sao task được ưu tiên
@@ -210,12 +198,10 @@ GEMINI
     ↓
 "Vì sao AI xếp như vậy?"
 # 🧪 DAY 7 — TESTING & DEMO
-## 💻 Dev 1
 - [ ] Fix UI bugs
 - [ ] Test Add / Edit / Delete
 - [ ] Test Calendar
 - [ ] Test Mobile
-## 🤖 Dev 2
 - [ ] Test normal schedule
 - [ ] Test multiple deadlines
 - [ ] Test missed session
