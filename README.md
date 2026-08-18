@@ -135,6 +135,7 @@ Task appears in Task List
 Task appears in Calendar
       ↓
 Update / Complete Task
+
 🤖 DEV 2 — Academic Planner & Gemini
 🧠 Planner Engine
 
