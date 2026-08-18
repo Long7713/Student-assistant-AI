@@ -60,42 +60,57 @@ export const TasksScreen: React.FC<TasksScreenProps> = ({
   });
 
   // Toggle Subtask
-  const handleToggleSubtask = (taskId: string, subtaskId: string) => {
-    setTasks((prev) =>
-      prev.map((t) => {
-        if (t.id === taskId && t.subtasks) {
-          const newSubtasks = t.subtasks.map((st) =>
-            st.id === subtaskId ? { ...st, completed: !st.completed } : st
-          );
-          const allDone = newSubtasks.every((st) => st.completed);
-          return {
-            ...t,
-            subtasks: newSubtasks,
-            status: allDone ? 'completed' : t.status,
-          };
-        }
-        return t;
-      })
-    );
-  };
+const handleToggleSubtask = (taskId: string, subtaskId: string) => {
+  setTasks((prev) =>
+    prev.map((t) => {
+      if (t.id === taskId && t.subtasks) {
+        const newSubtasks = t.subtasks.map((st) =>
+          st.id === subtaskId
+            ? { ...st, completed: !st.completed }
+            : st
+        );
+
+        const allDone = newSubtasks.every((st) => st.completed);
+        const completedCount = newSubtasks.filter(
+          (st) => st.completed
+        ).length;
+
+        return {
+          ...t,
+          subtasks: newSubtasks,
+          status: allDone
+            ? 'completed'
+            : completedCount > 0
+            ? 'in_progress'
+            : 'not_started',
+        };
+      }
+
+      return t;
+    })
+  );
+};
 
   // Toggle Task Completion
-  const handleToggleTaskComplete = (taskId: string) => {
-    setTasks((prev) =>
-      prev.map((t) => {
-        if (t.id === taskId) {
-          const isDone = t.status === 'completed';
-          return {
-            ...t,
-            status: isDone ? 'in_progress' : 'completed',
-            completedMinutes: isDone ? 0 : t.estimatedMinutes,
-            subtasks: t.subtasks?.map((st) => ({ ...st, completed: !isDone })),
-          };
-        }
-        return t;
-      })
-    );
-  };
+ const handleToggleTaskComplete = (taskId: string) => {
+  setTasks((prev) =>
+    prev.map((t) => {
+      if (t.id !== taskId) return t;
+
+      const isDone = t.status === 'completed';
+
+      return {
+        ...t,
+        status: isDone ? 'not_started' : 'completed',
+        completedMinutes: isDone ? 0 : t.estimatedMinutes,
+        subtasks: t.subtasks?.map((st) => ({
+          ...st,
+          completed: !isDone,
+        })),
+      };
+    })
+  );
+};      
 
   return (
     <div className="max-w-md sm:max-w-lg mx-auto px-4 py-5 space-y-5 pb-24">
