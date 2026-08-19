@@ -83,7 +83,7 @@ Cả team pull main mới nhất
 - [ ] Xác định dữ liệu Task
 - [ ] Kiểm tra state management hiện tại
 - [ ] Kiểm tra luồng Add Task
-- [ ] Xóa hoặc tách các component dư thừa
+- [+] Xóa hoặc tách các component dư thừa  (DNhân)
 
 >Course + Task data structure rõ ràng
 - [ ] Kiểm tra Gemini API
@@ -102,6 +102,7 @@ Cả team pull main mới nhất
 - [ ] Kiểm tra .env.example
 - [ ] Đảm bảo API key không bị push lên GitHub
 # 🟡 DAY 2 — COURSE & TASK SYSTEM
+- [ ] tạo local storage (DNhân)
 - [ ] Hoàn thiện Add Course
 - [ ] Edit Course
 - [ ] Delete Course
