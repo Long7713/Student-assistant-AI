@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Course, Task } from '../types';
+import { Course, Task, StudentPreferences } from '../types';
 import { 
   getTodayString, 
   getRelativeDateString, 
@@ -7,6 +7,7 @@ import {
   formatMinutesToDuration 
 } from '../utils/dateUtils';
 import { getCourseColor } from '../utils/courseColors';
+import { EditTaskModal } from './EditTaskModal';
 import { 
   CheckSquare, 
   Plus, 
@@ -17,21 +18,31 @@ import {
   Layers,
   ChevronDown,
   ChevronUp,
-  Sliders
+  Sliders,
+  Pencil,
+  Trash2,
+  AlertTriangle,
+  X
 } from 'lucide-react';
 
 interface TasksScreenProps {
   courses: Course[];
   tasks: Task[];
   setTasks: React.Dispatch<React.SetStateAction<Task[]>>;
+  preferences: StudentPreferences;
   onOpenAddTask: () => void;
+  onEditTask: (updatedTask: Task) => void;
+  onDeleteTask: (taskId: string) => void;
 }
 
 export const TasksScreen: React.FC<TasksScreenProps> = ({
   courses,
   tasks,
   setTasks,
+  preferences,
   onOpenAddTask,
+  onEditTask,
+  onDeleteTask,
 }) => {
   const today = getTodayString();
   const in3Days = getRelativeDateString(3);
@@ -39,6 +50,10 @@ export const TasksScreen: React.FC<TasksScreenProps> = ({
 
   const [activeFilter, setActiveFilter] = useState<'today' | 'urgent' | 'week' | 'completed'>('today');
   const [expandedTaskId, setExpandedTaskId] = useState<string | null>(null);
+
+  // Modal states
+  const [editingTask, setEditingTask] = useState<Task | null>(null);
+  const [taskToDelete, setTaskToDelete] = useState<Task | null>(null);
 
   // Filter tasks
   const filteredTasks = tasks.filter((t) => {
@@ -60,57 +75,62 @@ export const TasksScreen: React.FC<TasksScreenProps> = ({
   });
 
   // Toggle Subtask
-const handleToggleSubtask = (taskId: string, subtaskId: string) => {
-  setTasks((prev) =>
-    prev.map((t) => {
-      if (t.id === taskId && t.subtasks) {
-        const newSubtasks = t.subtasks.map((st) =>
-          st.id === subtaskId
-            ? { ...st, completed: !st.completed }
-            : st
-        );
+  const handleToggleSubtask = (taskId: string, subtaskId: string) => {
+    setTasks((prev) =>
+      prev.map((t) => {
+        if (t.id === taskId && t.subtasks) {
+          const newSubtasks = t.subtasks.map((st) =>
+            st.id === subtaskId
+              ? { ...st, completed: !st.completed }
+              : st
+          );
 
-        const allDone = newSubtasks.every((st) => st.completed);
-        const completedCount = newSubtasks.filter(
-          (st) => st.completed
-        ).length;
+          const allDone = newSubtasks.every((st) => st.completed);
+          const completedCount = newSubtasks.filter((st) => st.completed).length;
+
+          return {
+            ...t,
+            subtasks: newSubtasks,
+            status: allDone
+              ? 'completed'
+              : completedCount > 0
+              ? 'in_progress'
+              : 'not_started',
+          };
+        }
+
+        return t;
+      })
+    );
+  };
+
+  // Toggle Task Completion
+  const handleToggleTaskComplete = (taskId: string) => {
+    setTasks((prev) =>
+      prev.map((t) => {
+        if (t.id !== taskId) return t;
+
+        const isDone = t.status === 'completed';
 
         return {
           ...t,
-          subtasks: newSubtasks,
-          status: allDone
-            ? 'completed'
-            : completedCount > 0
-            ? 'in_progress'
-            : 'not_started',
+          status: isDone ? 'not_started' : 'completed',
+          completedMinutes: isDone ? 0 : t.estimatedMinutes,
+          subtasks: t.subtasks?.map((st) => ({
+            ...st,
+            completed: !isDone,
+          })),
         };
-      }
+      })
+    );
+  };
 
-      return t;
-    })
-  );
-};
-
-  // Toggle Task Completion
- const handleToggleTaskComplete = (taskId: string) => {
-  setTasks((prev) =>
-    prev.map((t) => {
-      if (t.id !== taskId) return t;
-
-      const isDone = t.status === 'completed';
-
-      return {
-        ...t,
-        status: isDone ? 'not_started' : 'completed',
-        completedMinutes: isDone ? 0 : t.estimatedMinutes,
-        subtasks: t.subtasks?.map((st) => ({
-          ...st,
-          completed: !isDone,
-        })),
-      };
-    })
-  );
-};      
+  const handleConfirmDelete = () => {
+    if (taskToDelete) {
+      onDeleteTask(taskToDelete.id);
+      setTaskToDelete(null);
+    }
+  };
 
   return (
     <div className="max-w-md sm:max-w-lg mx-auto px-4 py-5 space-y-5 pb-24">
@@ -185,7 +205,7 @@ const handleToggleSubtask = (taskId: string, subtaskId: string) => {
                 
                 {/* Header Row */}
                 <div className="flex items-start justify-between gap-2">
-                  <div className="flex items-start space-x-2.5">
+                  <div className="flex items-start space-x-2.5 flex-1 min-w-0">
                     {/* Checkmark Button */}
                     <button
                       onClick={() => handleToggleTaskComplete(task.id)}
@@ -198,7 +218,7 @@ const handleToggleSubtask = (taskId: string, subtaskId: string) => {
                       {isCompleted && <CheckCircle2 className="w-3.5 h-3.5 stroke-[3]" />}
                     </button>
 
-                    <div>
+                    <div className="flex-1 min-w-0">
                       <div className="flex items-center space-x-1.5 mb-0.5">
                         <span className={`px-2 py-0.5 rounded text-[10px] font-bold ${colors.badgeBg} ${colors.badgeText}`}>
                           {course?.code}
@@ -214,16 +234,36 @@ const handleToggleSubtask = (taskId: string, subtaskId: string) => {
                         </span>
                       </div>
 
-                      <h3 className={`font-bold text-sm text-slate-900 leading-snug ${isCompleted ? 'line-through text-slate-400' : ''}`}>
+                      <h3 className={`font-bold text-sm text-slate-900 leading-snug break-words ${isCompleted ? 'line-through text-slate-400' : ''}`}>
                         {task.title}
                       </h3>
                     </div>
                   </div>
 
-                  {/* Urgency Pill */}
-                  <span className={`px-2 py-0.5 rounded-full text-[10px] font-bold border shrink-0 ${urgency.badgeClass}`}>
-                    {urgency.label}
-                  </span>
+                  {/* Actions & Urgency Pill */}
+                  <div className="flex items-center space-x-1 shrink-0">
+                    <span className={`px-2 py-0.5 rounded-full text-[10px] font-bold border ${urgency.badgeClass}`}>
+                      {urgency.label}
+                    </span>
+
+                    {/* Edit Button */}
+                    <button
+                      onClick={() => setEditingTask(task)}
+                      title="Chỉnh sửa bài tập"
+                      className="p-1.5 rounded-lg text-slate-400 hover:text-indigo-600 hover:bg-indigo-50 transition-colors"
+                    >
+                      <Pencil className="w-3.5 h-3.5" />
+                    </button>
+
+                    {/* Delete Button */}
+                    <button
+                      onClick={() => setTaskToDelete(task)}
+                      title="Xoá bài tập"
+                      className="p-1.5 rounded-lg text-slate-400 hover:text-rose-600 hover:bg-rose-50 transition-colors"
+                    >
+                      <Trash2 className="w-3.5 h-3.5" />
+                    </button>
+                  </div>
                 </div>
 
                 {/* Progress Bar & Workload */}
@@ -297,6 +337,59 @@ const handleToggleSubtask = (taskId: string, subtaskId: string) => {
           </div>
         )}
       </div>
+
+      {/* Edit Task Modal */}
+      <EditTaskModal
+        isOpen={Boolean(editingTask)}
+        onClose={() => setEditingTask(null)}
+        task={editingTask}
+        courses={courses}
+        preferences={preferences}
+        onSaveTask={onEditTask}
+      />
+
+      {/* Delete Confirmation Dialog */}
+      {taskToDelete && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-900/60 backdrop-blur-xs animate-in fade-in duration-200">
+          <div className="w-full max-w-sm bg-white rounded-3xl p-5 shadow-2xl border border-slate-100 space-y-4 animate-in zoom-in-95 duration-200">
+            <div className="flex items-center space-x-3">
+              <div className="w-10 h-10 rounded-2xl bg-rose-50 border border-rose-200/60 flex items-center justify-center text-rose-600 shrink-0">
+                <AlertTriangle className="w-5 h-5" />
+              </div>
+              <div>
+                <h3 className="text-sm font-bold text-slate-900">
+                  Xác nhận xoá nhiệm vụ?
+                </h3>
+                <p className="text-[11px] text-slate-500">
+                  Hành động này không thể hoàn tác
+                </p>
+              </div>
+            </div>
+
+            <p className="text-xs text-slate-600 bg-slate-50 p-3 rounded-xl leading-relaxed">
+              Bạn có chắc muốn xoá bài tập <strong className="text-slate-900">"{taskToDelete.title}"</strong>? 
+              Tất cả các phiên học đã lên lịch cho bài tập này trên lịch học cũng sẽ được dọn dẹp.
+            </p>
+
+            <div className="flex items-center justify-end space-x-2 pt-1">
+              <button
+                type="button"
+                onClick={() => setTaskToDelete(null)}
+                className="px-4 py-2 rounded-xl border border-slate-200 text-xs font-bold text-slate-600 hover:bg-slate-50 transition-colors"
+              >
+                Hủy
+              </button>
+              <button
+                type="button"
+                onClick={handleConfirmDelete}
+                className="px-4 py-2 rounded-xl bg-rose-600 hover:bg-rose-700 text-xs font-bold text-white shadow-xs transition-colors"
+              >
+                Xoá nhiệm vụ
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
 
     </div>
   );

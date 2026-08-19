@@ -15,6 +15,8 @@ import {
   initialTasks, 
   initialSessions 
 } from './data/initialData';
+import { useLocalStorage } from './hooks/useLocalStorage';
+import { STORAGE_KEYS, resetAllStorageToDefaults } from './utils/storage';
 import { calculatePlannerRebalance } from './utils/plannerEngine';
 import { getTodayString } from './utils/dateUtils';
 import { MobileHeader } from './components/MobileHeader';
@@ -31,11 +33,11 @@ import { Sparkles, X, CheckCircle2 } from 'lucide-react';
 
 export default function App() {
   const [currentTab, setCurrentTab] = useState<NavigationTab>('home');
-  const [courses, setCourses] = useState<Course[]>(initialCourses);
-  const [classSchedule, setClassSchedule] = useState<ClassSchedule[]>(initialClassSchedule);
-  const [preferences, setPreferences] = useState<StudentPreferences>(initialPreferences);
-  const [tasks, setTasks] = useState<Task[]>(initialTasks);
-  const [sessions, setSessions] = useState<StudySession[]>(initialSessions);
+  const [courses, setCourses] = useLocalStorage<Course[]>(STORAGE_KEYS.COURSES, initialCourses);
+  const [classSchedule, setClassSchedule] = useLocalStorage<ClassSchedule[]>(STORAGE_KEYS.CLASS_SCHEDULE, initialClassSchedule);
+  const [preferences, setPreferences] = useLocalStorage<StudentPreferences>(STORAGE_KEYS.PREFERENCES, initialPreferences);
+  const [tasks, setTasks] = useLocalStorage<Task[]>(STORAGE_KEYS.TASKS, initialTasks);
+  const [sessions, setSessions] = useLocalStorage<StudySession[]>(STORAGE_KEYS.SESSIONS, initialSessions);
 
   // Modals state
   const [isAddTaskOpen, setIsAddTaskOpen] = useState(false);
@@ -64,6 +66,39 @@ export default function App() {
     showToast(
       'Đã thêm nhiệm vụ & xếp lịch học',
       `AI đã lên lịch các phiên học cho "${newTask.title}" bao quanh các tiết học cố định.`
+    );
+  };
+
+  // Edit Task Handler
+  const handleEditTask = (updatedTask: Task) => {
+    setTasks((prev) => prev.map((t) => (t.id === updatedTask.id ? updatedTask : t)));
+    // Synchronize linked study sessions
+    setSessions((prev) =>
+      prev.map((s) => {
+        if (s.taskId === updatedTask.id) {
+          return {
+            ...s,
+            courseId: updatedTask.courseId,
+          };
+        }
+        return s;
+      })
+    );
+    showToast(
+      'Đã cập nhật bài tập',
+      `Thông tin nhiệm vụ "${updatedTask.title}" đã được lưu thành công.`
+    );
+  };
+
+  // Delete Task Handler (Cascading delete of linked study sessions)
+  const handleDeleteTask = (taskId: string) => {
+    const deletedTask = tasks.find((t) => t.id === taskId);
+    setTasks((prev) => prev.filter((t) => t.id !== taskId));
+    // Clean up associated study sessions from calendar
+    setSessions((prev) => prev.filter((s) => s.taskId !== taskId));
+    showToast(
+      'Đã xoá nhiệm vụ',
+      `Đã gỡ bỏ bài tập "${deletedTask?.title || 'nhiệm vụ'}" và các phiên học trên lịch.`
     );
   };
 
@@ -160,11 +195,12 @@ export default function App() {
 
   // Reset to sample student data
   const handleResetSampleData = () => {
-    setCourses(initialCourses);
-    setClassSchedule(initialClassSchedule);
-    setPreferences(initialPreferences);
-    setTasks(initialTasks);
-    setSessions(initialSessions);
+    const defaults = resetAllStorageToDefaults();
+    setCourses(defaults.courses);
+    setClassSchedule(defaults.classSchedule);
+    setPreferences(defaults.preferences);
+    setTasks(defaults.tasks);
+    setSessions(defaults.sessions);
     showToast('Đã đặt lại dữ liệu mẫu', 'Khôi phục lịch học và bài tập mẫu của sinh viên CNTT.');
   };
 
@@ -256,7 +292,10 @@ export default function App() {
             courses={courses}
             tasks={tasks}
             setTasks={setTasks}
+            preferences={preferences}
             onOpenAddTask={() => setIsAddTaskOpen(true)}
+            onEditTask={handleEditTask}
+            onDeleteTask={handleDeleteTask}
           />
         )}
 
