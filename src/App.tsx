@@ -145,10 +145,69 @@ export default function App() {
   };
 
   const handleCompleteSession = (sessionId: string) => {
+    const sessionToComplete = sessions.find((s) => s.id === sessionId);
+    if (!sessionToComplete) return;
+
     setSessions((prev) =>
       prev.map((s) => (s.id === sessionId ? { ...s, status: 'completed' as const } : s))
     );
-    showToast('Hoàn thành xuất sắc! 🎉', 'Đã ghi nhận tiến độ và khối lượng học tập.');
+
+    // Đồng bộ sang Task: tăng completedMinutes và cập nhật status sang 'completed' khi xong
+    if (sessionToComplete.taskId) {
+      setTasks((prevTasks) =>
+        prevTasks.map((t) => {
+          if (t.id === sessionToComplete.taskId) {
+            const newMinutes = Math.min(t.estimatedMinutes, t.completedMinutes + sessionToComplete.durationMinutes);
+            // Kiểm tra xem tất cả session của task này đã xong chưa
+            const remainingPendingSessions = sessions.filter(
+              (s) => s.taskId === t.id && s.id !== sessionId && s.status !== 'completed'
+            );
+            const isCompleted = newMinutes >= t.estimatedMinutes || remainingPendingSessions.length === 0;
+
+            return {
+              ...t,
+              completedMinutes: newMinutes,
+              status: isCompleted ? 'completed' : 'in_progress',
+            };
+          }
+          return t;
+        })
+      );
+    }
+    showToast('Hoàn thành xuất sắc! 🎉', 'Đã ghi nhận tiến độ và hoàn thành bài tập.');
+  };
+
+  // Hoàn tác / Bỏ hoàn thành session
+  const handleUndoCompleteSession = (sessionId: string) => {
+    const sessionToUndo = sessions.find((s) => s.id === sessionId);
+    if (!sessionToUndo) return;
+
+    setSessions((prev) =>
+      prev.map((s) => (s.id === sessionId ? { ...s, status: 'scheduled' as const } : s))
+    );
+
+    if (sessionToUndo.taskId) {
+      setTasks((prevTasks) =>
+        prevTasks.map((t) => {
+          if (t.id === sessionToUndo.taskId) {
+            const newMinutes = Math.max(0, t.completedMinutes - sessionToUndo.durationMinutes);
+            return {
+              ...t,
+              completedMinutes: newMinutes,
+              status: newMinutes === 0 ? 'not_started' : 'in_progress',
+            };
+          }
+          return t;
+        })
+      );
+    }
+    showToast('Đã bỏ hoàn thành ↩️', 'Phiên học đã được chuyển về trạng thái chưa học.');
+  };
+
+  // Thêm buổi học bù / tự do
+  const handleAddCustomSession = (newSession: StudySession) => {
+    setSessions((prev) => [...prev, newSession]);
+    showToast('Đã thêm buổi học bù 📅', `Đã lưu phiên học vào lịch ngày ${newSession.date}.`);
   };
 
   const handleMissFromTimer = (sessionId: string) => {
@@ -219,6 +278,7 @@ export default function App() {
             onOpenFocusTimer={handleOpenFocusTimer}
             onTriggerReplanForSession={handleTriggerReplan}
             onCompleteSession={handleCompleteSession}
+            onUndoCompleteSession={handleUndoCompleteSession}
             onNavigateTab={setCurrentTab}
             onOpenAddTask={() => setIsAddTaskOpen(true)}
             onSimulateDemoMissed={handleSimulateDemoMissed}
@@ -234,7 +294,9 @@ export default function App() {
             onOpenFocusTimer={handleOpenFocusTimer}
             onTriggerReplanForSession={handleTriggerReplan}
             onCompleteSession={handleCompleteSession}
+            onUndoCompleteSession={handleUndoCompleteSession}
             onOpenAddTask={() => setIsAddTaskOpen(true)}
+            onAddCustomSession={handleAddCustomSession}
           />
         )}
 

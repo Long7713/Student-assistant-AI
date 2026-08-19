@@ -121,7 +121,7 @@ export interface ReplanDiff {
   proposedSessions: StudySession[];
 }
 
-export type NavigationTab = 'home' | 'calendar' | 'ai_plan' | 'tasks' | 'profile';
+export type NavigationTab = 'home' | 'calendar' | 'ai_plan' | 'tasks' | 'discover' | 'profile';
 
 export type ActiveScreen = 'onboarding' | 'dashboard' | 'add_task' | 'replan_modal';
 

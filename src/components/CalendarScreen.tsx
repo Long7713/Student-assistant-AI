@@ -30,7 +30,9 @@ interface CalendarScreenProps {
   onOpenFocusTimer: (session: StudySession) => void;
   onTriggerReplanForSession: (session: StudySession, reason?: string) => void;
   onCompleteSession: (sessionId: string) => void;
+  onUndoCompleteSession?: (sessionId: string) => void;
   onOpenAddTask: () => void;
+  onAddCustomSession?: (newSession: StudySession) => void;
 }
 
 export const CalendarScreen: React.FC<CalendarScreenProps> = ({
@@ -41,7 +43,9 @@ export const CalendarScreen: React.FC<CalendarScreenProps> = ({
   onOpenFocusTimer,
   onTriggerReplanForSession,
   onCompleteSession,
+  onUndoCompleteSession,
   onOpenAddTask,
+  onAddCustomSession,
 }) => {
   const today = getTodayString();
   const tomorrow = getRelativeDateString(1);
@@ -57,6 +61,36 @@ export const CalendarScreen: React.FC<CalendarScreenProps> = ({
 
   const [selectedDate, setSelectedDate] = useState<string>(today);
   const [filterType, setFilterType] = useState<'all' | 'sessions' | 'classes'>('all');
+
+  // State thêm buổi học bù
+  const [showAddCustomModal, setShowAddCustomModal] = useState(false);
+  const [customCourseId, setCustomCourseId] = useState(courses[0]?.id || '');
+  const [customGoal, setCustomGoal] = useState('');
+  const [customStartTime, setCustomStartTime] = useState('14:30');
+  const [customEndTime, setCustomEndTime] = useState('16:00');
+
+  const handleSaveCustomSession = (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!customGoal.trim() || !onAddCustomSession) return;
+    const [sh, sm] = customStartTime.split(':').map(Number);
+    const [eh, em] = customEndTime.split(':').map(Number);
+    const durationMinutes = Math.max(30, (eh * 60 + em) - (sh * 60 + sm));
+
+    onAddCustomSession({
+      id: `sess_custom_${Date.now()}`,
+      courseId: customCourseId,
+      date: selectedDate,
+      startTime: customStartTime,
+      endTime: customEndTime,
+      durationMinutes,
+      status: 'scheduled',
+      goal: customGoal.trim(),
+      replanTag: '📅 Học bù / Tự do',
+    });
+
+    setCustomGoal('');
+    setShowAddCustomModal(false);
+  };
 
   // Filter study sessions for selected date
   const selectedSessions = sessions.filter((s) => s.date === selectedDate);
@@ -89,14 +123,90 @@ export const CalendarScreen: React.FC<CalendarScreenProps> = ({
           <p className="text-xs text-slate-500 font-medium">Tiết học cố định & phiên học AI tự động</p>
         </div>
 
-        <button
-          onClick={onOpenAddTask}
-          className="flex items-center space-x-1 px-3 py-1.5 rounded-xl bg-indigo-600 text-white text-xs font-bold shadow-xs hover:bg-indigo-700 active:scale-95 transition-all"
-        >
-          <Plus className="w-3.5 h-3.5" />
-          <span>Thêm</span>
-        </button>
+        <div className="flex items-center space-x-1.5">
+          {onAddCustomSession && (
+            <button
+              onClick={() => setShowAddCustomModal(!showAddCustomModal)}
+              className="flex items-center space-x-1 px-2.5 py-1.5 rounded-xl bg-emerald-50 text-emerald-800 border border-emerald-200 text-xs font-bold shadow-xs hover:bg-emerald-100 active:scale-95 transition-all"
+            >
+              <Plus className="w-3.5 h-3.5" />
+              <span>Học bù</span>
+            </button>
+          )}
+
+          <button
+            onClick={onOpenAddTask}
+            className="flex items-center space-x-1 px-3 py-1.5 rounded-xl bg-indigo-600 text-white text-xs font-bold shadow-xs hover:bg-indigo-700 active:scale-95 transition-all"
+          >
+            <Plus className="w-3.5 h-3.5" />
+            <span>Thêm bài tập</span>
+          </button>
+        </div>
       </div>
+
+      {/* Form thêm buổi học bù */}
+      {showAddCustomModal && (
+        <form onSubmit={handleSaveCustomSession} className="bg-emerald-50/50 rounded-2xl border border-emerald-200 p-3.5 space-y-2.5 text-xs">
+          <div className="flex items-center justify-between">
+            <span className="font-bold text-emerald-900">Thêm buổi học bù / Tự học</span>
+            <span className="text-[10px] text-emerald-700 font-medium">{formatFriendlyDate(selectedDate)}</span>
+          </div>
+          <div className="grid grid-cols-2 gap-2">
+            <select
+              value={customCourseId}
+              onChange={(e) => setCustomCourseId(e.target.value)}
+              className="px-2.5 py-1.5 rounded-xl border border-emerald-200 bg-white"
+            >
+              {courses.map((c) => (
+                <option key={c.id} value={c.id}>{c.code} - {c.name}</option>
+              ))}
+            </select>
+            <input
+              type="text"
+              required
+              placeholder="Nội dung/mục tiêu học"
+              value={customGoal}
+              onChange={(e) => setCustomGoal(e.target.value)}
+              className="px-2.5 py-1.5 rounded-xl border border-emerald-200 bg-white"
+            />
+          </div>
+          <div className="grid grid-cols-2 gap-2">
+            <div className="flex items-center space-x-1">
+              <span className="text-[10px] text-slate-500">Từ:</span>
+              <input
+                type="time"
+                value={customStartTime}
+                onChange={(e) => setCustomStartTime(e.target.value)}
+                className="w-full px-2 py-1 rounded-lg border border-emerald-200 bg-white text-[11px]"
+              />
+            </div>
+            <div className="flex items-center space-x-1">
+              <span className="text-[10px] text-slate-500">Đến:</span>
+              <input
+                type="time"
+                value={customEndTime}
+                onChange={(e) => setCustomEndTime(e.target.value)}
+                className="w-full px-2 py-1 rounded-lg border border-emerald-200 bg-white text-[11px]"
+              />
+            </div>
+          </div>
+          <div className="flex justify-end space-x-2 pt-1">
+            <button
+              type="button"
+              onClick={() => setShowAddCustomModal(false)}
+              className="px-2.5 py-1 text-slate-500 font-semibold"
+            >
+              Hủy
+            </button>
+            <button
+              type="submit"
+              className="px-3 py-1 bg-emerald-600 hover:bg-emerald-700 text-white font-bold rounded-lg"
+            >
+              Lưu lịch học
+            </button>
+          </div>
+        </form>
+      )}
 
       {/* Date Carousel Selector */}
       <div className="flex space-x-2 overflow-x-auto pb-1 scrollbar-none">
@@ -255,10 +365,21 @@ export const CalendarScreen: React.FC<CalendarScreenProps> = ({
                         )}
 
                         {session.status === 'completed' && (
-                          <span className="inline-flex items-center space-x-1 px-2 py-0.5 rounded text-[10px] font-bold bg-emerald-100 text-emerald-800">
-                            <CheckCircle2 className="w-3 h-3" />
-                            <span>Đã xong</span>
-                          </span>
+                          <div className="flex items-center space-x-1.5">
+                            <span className="inline-flex items-center space-x-1 px-2 py-0.5 rounded text-[10px] font-bold bg-emerald-100 text-emerald-800">
+                              <CheckCircle2 className="w-3 h-3" />
+                              <span>Đã xong</span>
+                            </span>
+                            {onUndoCompleteSession && (
+                              <button
+                                onClick={() => onUndoCompleteSession(session.id)}
+                                className="px-2 py-0.5 text-[10px] font-bold text-slate-500 hover:text-indigo-600 hover:bg-indigo-50 border border-slate-200 rounded-md transition-all"
+                                title="Bỏ hoàn thành"
+                              >
+                                ↩️ Bỏ hoàn thành
+                              </button>
+                            )}
+                          </div>
                         )}
 
                         {session.status === 'missed' && (

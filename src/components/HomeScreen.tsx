@@ -34,6 +34,7 @@ interface HomeScreenProps {
   onOpenFocusTimer: (session: StudySession) => void;
   onTriggerReplanForSession: (session: StudySession, reason?: string) => void;
   onCompleteSession: (sessionId: string) => void;
+  onUndoCompleteSession?: (sessionId: string) => void;
   onNavigateTab: (tab: any) => void;
   onOpenAddTask: () => void;
   onSimulateDemoMissed: () => void;
@@ -48,6 +49,7 @@ export const HomeScreen: React.FC<HomeScreenProps> = ({
   onOpenFocusTimer,
   onTriggerReplanForSession,
   onCompleteSession,
+  onUndoCompleteSession,
   onNavigateTab,
   onOpenAddTask,
   onSimulateDemoMissed,
@@ -316,6 +318,34 @@ export const HomeScreen: React.FC<HomeScreenProps> = ({
             ✓ Không bị quá tải
           </span>
         </div>
+
+        {/* Danh sách phiên học đã hoàn thành hôm nay để hoàn tác */}
+        {completedToday.length > 0 && onUndoCompleteSession && (
+          <div className="mt-3 pt-2.5 border-t border-slate-100 space-y-1.5">
+            <span className="text-[10px] font-bold text-slate-400 uppercase tracking-wider block">Phiên đã hoàn thành hôm nay:</span>
+            {completedToday.map((sess) => {
+              const task = tasks.find((t) => t.id === sess.taskId);
+              const course = courses.find((c) => c.id === task?.courseId);
+              const colors = getCourseColor(course?.color);
+              return (
+                <div key={sess.id} className="flex items-center justify-between text-[11px] bg-slate-50 p-2 rounded-xl border border-slate-100">
+                  <div className="flex items-center space-x-1.5 truncate max-w-[70%]">
+                    <span className={`px-1.5 py-0.2 rounded text-[9px] font-bold ${colors.badgeBg} ${colors.badgeText}`}>
+                      {course?.code || 'MÔN'}
+                    </span>
+                    <span className="font-semibold text-slate-700 truncate">{task?.title || sess.goal}</span>
+                  </div>
+                  <button
+                    onClick={() => onUndoCompleteSession(sess.id)}
+                    className="px-2.5 py-1 text-[10px] font-bold text-indigo-600 hover:text-white hover:bg-indigo-600 border border-indigo-200 hover:border-indigo-600 rounded-lg transition-all shrink-0"
+                  >
+                    ↩️ Hoàn tác
+                  </button>
+                </div>
+              );
+            })}
+          </div>
+        )}
       </div>
 
       {/* 5. SECTION 3: HẠN SẮP TỚI */}
