@@ -78,27 +78,27 @@ Cả team pull main mới nhất
 
 # 🟢 DAY 1 — AUDIT & STABILIZATION
 
- + Kiểm tra cấu trúc project (Long)
+(+) Kiểm tra cấu trúc project (Long) 
 
- + Xác định dữ liệu Course (Long)
+(+) Xác định dữ liệu Course (Long)
 
-+ Xác định dữ liệu Task (Long)
+(+) Xác định dữ liệu Task (Long)
 
-- Kiểm tra state management hiện tại
+(+) Kiểm tra state management hiện tại (Long)
 
-+ Kiểm tra luồng Add Task
+(+) Kiểm tra luồng Add Task(Long)
 
 - [+] Xóa hoặc tách các component dư thừa  (DNhân)
 
 >Course + Task data structure rõ ràng
 
-+ Kiểm tra Gemini API
++ Kiểm tra Gemini API(Long)
 
 -  Kiểm tra model đang sử dụng
 
 - Fix lỗi model không còn hỗ trợ
 
--  Kiểm tra logic Re-plan hiện tại
+(+) Kiểm tra logic Re-plan hiện tại(Long)
 
 - Tách AI logic khỏi UI
 
@@ -106,17 +106,17 @@ Cả team pull main mới nhất
 >AI Planner có thể chạy độc lập với UI
 
 ## 👑 Leader
- - Kiểm tra GitHub
+ (+) Kiểm tra GitHub (Long)
 
- - Chuẩn hóa README
+ (+) Chuẩn hóa README (Long)
 
  - Phân chia branch cho 2 Dev
 
- - Kiểm tra .gitignore
+ (+) Kiểm tra .gitignore
 
  - Kiểm tra .env.example
 
- - Đảm bảo API key không bị push lên GitHub
+ (+) Đảm bảo API key không bị push lên GitHub (Long)
 # 🟡 DAY 2 — COURSE & TASK SYSTEM
  - tạo local storage (DNhân)
 
