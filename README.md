@@ -1,3 +1,5 @@
+> Can hop de ban ve feature
+
 <div align="center">
 <img width="1200" height="475" alt="GHBanner" src="https://ai.google.dev/static/site-assets/images/share-ais-513315318.png" />
 </div>
@@ -106,6 +108,7 @@ Cả team pull main mới nhất
 >AI Planner có thể chạy độc lập với UI
 
 ## 👑 Leader
+
  (+) Kiểm tra GitHub (Long)
 
  (+) Chuẩn hóa README (Long)
@@ -117,6 +120,7 @@ Cả team pull main mới nhất
  - Kiểm tra .env.example
 
  (+) Đảm bảo API key không bị push lên GitHub (Long)
+
 # 🟡 DAY 2 — COURSE & TASK SYSTEM
  - tạo local storage (DNhân)
 
