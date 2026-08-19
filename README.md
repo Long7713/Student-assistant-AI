@@ -104,11 +104,11 @@ Cả team pull main mới nhất
 # 🟡 DAY 2 — COURSE & TASK SYSTEM
 - [+] tạo local storage (DNhân)
 - [ ] Hoàn thiện Add Course
-- [ ] Edit Course (DNhan)
-- [ ] Delete Course (Dnhan)
+- [ ] Edit Course 
+- [ ] Delete Course
 - [ ] Hoàn thiện Add Task
-- [ ] Edit Task
-- [ ] Delete Task
+- [+] Edit Task (DNhan)
+- [+] Delete Task (DNhan)
 
 > Task cần có:
 Task

@@ -69,6 +69,39 @@ export default function App() {
     );
   };
 
+  // Edit Task Handler
+  const handleEditTask = (updatedTask: Task) => {
+    setTasks((prev) => prev.map((t) => (t.id === updatedTask.id ? updatedTask : t)));
+    // Synchronize linked study sessions
+    setSessions((prev) =>
+      prev.map((s) => {
+        if (s.taskId === updatedTask.id) {
+          return {
+            ...s,
+            courseId: updatedTask.courseId,
+          };
+        }
+        return s;
+      })
+    );
+    showToast(
+      'Đã cập nhật bài tập',
+      `Thông tin nhiệm vụ "${updatedTask.title}" đã được lưu thành công.`
+    );
+  };
+
+  // Delete Task Handler (Cascading delete of linked study sessions)
+  const handleDeleteTask = (taskId: string) => {
+    const deletedTask = tasks.find((t) => t.id === taskId);
+    setTasks((prev) => prev.filter((t) => t.id !== taskId));
+    // Clean up associated study sessions from calendar
+    setSessions((prev) => prev.filter((s) => s.taskId !== taskId));
+    showToast(
+      'Đã xoá nhiệm vụ',
+      `Đã gỡ bỏ bài tập "${deletedTask?.title || 'nhiệm vụ'}" và các phiên học trên lịch.`
+    );
+  };
+
   // Core Demo Moment & Re-plan Trigger
   const handleTriggerReplan = async (
     targetSession: StudySession,
@@ -259,7 +292,10 @@ export default function App() {
             courses={courses}
             tasks={tasks}
             setTasks={setTasks}
+            preferences={preferences}
             onOpenAddTask={() => setIsAddTaskOpen(true)}
+            onEditTask={handleEditTask}
+            onDeleteTask={handleDeleteTask}
           />
         )}
 
