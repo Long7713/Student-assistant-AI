@@ -78,9 +78,9 @@ Cả team pull main mới nhất
 
 # 🟢 DAY 1 — AUDIT & STABILIZATION
 
-+ Kiểm tra cấu trúc project (Long)
+ + Kiểm tra cấu trúc project (Long)
 
-+ Xác định dữ liệu Course (Long)
+ + Xác định dữ liệu Course (Long)
 
 + Xác định dữ liệu Task (Long)
 
