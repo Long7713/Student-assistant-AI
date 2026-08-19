@@ -102,7 +102,7 @@ Cả team pull main mới nhất
 - [ ] Kiểm tra .env.example
 - [ ] Đảm bảo API key không bị push lên GitHub
 # 🟡 DAY 2 — COURSE & TASK SYSTEM
-- [ ] tạo local storage (DNhân)
+- [+] tạo local storage (DNhân)
 - [ ] Hoàn thiện Add Course
 - [ ] Edit Course
 - [ ] Delete Course
