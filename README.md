@@ -26,7 +26,7 @@ View your app in AI Studio: https://ai.studio/apps/24b67902-7da8-426c-846a-9eddf
 
 ### 2.1 Sơ đồ luồng dữ liệu tổng quan (Level 0 DFD)
 
-```mermaid
+
 graph TD
     User([Sinh viên / User]) <--> MobileApp[EduMind AI Mobile App]
     
@@ -41,7 +41,7 @@ graph TD
         MobileApp <--> GCalendar[Google Calendar API]
     end
 ---
-```
+
 ## 📅 Lịch Triển Khai Chi Tiết
 
 | Ngày & Thời Gian | Hạng Mục Công Việc | Chi Tiết Thực Hiện | Deliverables / Output |
