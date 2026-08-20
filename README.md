@@ -44,6 +44,9 @@ graph TD
 
 ## 📅 Lịch Triển Khai Chi Tiết
 
+>>Báo trong mess mình làm phần nào, sau đó làm phần nào commit vào rồi đánh dấu "+" vào
+
+
 | Ngày & Thời Gian | Hạng Mục Công Việc | Chi Tiết Thực Hiện | Deliverables / Output |
 | :--- | :--- | :--- | :--- |
 | **Day 1**<br>*(14/08/2026)* | **Khởi tạo & Kiến trúc** | - Thiết lập Repo Github, Flutter/React Native base project.<br>- Khởi tạo Firebase Project & Google Cloud Platform (GCP) Console.<br>- Thiết kế Database Schema trên Firestore (Users, Schedules, Tasks, Docs). | - Base Source Code Structure.<br>- Firestore Database Rules & Collection Schema. |
