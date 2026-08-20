@@ -1,376 +1,198 @@
-import React, { useState } from 'react';
+import React, { useState } from "react";
+import { Header } from "./components/Header";
+import { Sidebar } from "./components/Sidebar";
+import { TimetableView } from "./components/TimetableView";
+import { DeadlinesView } from "./components/DeadlinesView";
+import { DocsView } from "./components/DocsView";
+import { LeaderboardView } from "./components/LeaderboardView";
+import { ScholarshipAndGPAView } from "./components/ScholarshipAndGPAView";
+import { DRLView } from "./components/DRLView";
+import { ScheduleOptimizerModal } from "./components/ScheduleOptimizerModal";
+import { GenZChatDrawer } from "./components/GenZChatDrawer";
 import { 
-  NavigationTab,
-  Course, 
-  ClassSchedule, 
-  StudentPreferences, 
-  Task, 
-  StudySession, 
-  ReplanDiff 
-} from './types';
-import { 
-  initialCourses, 
-  initialClassSchedule, 
-  initialPreferences, 
-  initialTasks, 
-  initialSessions 
-} from './data/initialData';
-import { calculatePlannerRebalance } from './utils/plannerEngine';
-import { getTodayString } from './utils/dateUtils';
-import { MobileHeader } from './components/MobileHeader';
-import { BottomNav } from './components/BottomNav';
-import { HomeScreen } from './components/HomeScreen';
-import { CalendarScreen } from './components/CalendarScreen';
-import { AIPlanScreen } from './components/AIPlanScreen';
-import { TasksScreen } from './components/TasksScreen';
-import { ProfileScreen } from './components/ProfileScreen';
-import { AddTaskModal } from './components/AddTaskModal';
-import { ReplanBottomSheet } from './components/ReplanBottomSheet';
-import { FocusTimerModal } from './components/FocusTimerModal';
-import { Sparkles, X, CheckCircle2 } from 'lucide-react';
+  INITIAL_COURSES, 
+  INITIAL_SCHEDULE_PLANS, 
+  INITIAL_DEADLINES, 
+  INITIAL_DOCS, 
+  INITIAL_LEADERBOARD 
+} from "./mockData";
+import { Course, SchedulePlan, DeadlineTask, SmartDoc, LeaderboardUser } from "./types";
 
 export default function App() {
-  const [currentTab, setCurrentTab] = useState<NavigationTab>('home');
-  const [courses, setCourses] = useState<Course[]>(initialCourses);
-  const [classSchedule, setClassSchedule] = useState<ClassSchedule[]>(initialClassSchedule);
-  const [preferences, setPreferences] = useState<StudentPreferences>(initialPreferences);
-  const [tasks, setTasks] = useState<Task[]>(initialTasks);
-  const [sessions, setSessions] = useState<StudySession[]>(initialSessions);
+  const [activeTab, setActiveTab] = useState<string>("schedule");
+  const [courses, setCourses] = useState<Course[]>(INITIAL_COURSES);
+  const [plans, setPlans] = useState<SchedulePlan[]>(INITIAL_SCHEDULE_PLANS);
+  const [activePlanId, setActivePlanId] = useState<string>("plan-1");
+  
+  const [deadlines, setDeadlines] = useState<DeadlineTask[]>(INITIAL_DEADLINES);
+  const [docs, setDocs] = useState<SmartDoc[]>(INITIAL_DOCS);
+  const [leaderboardUsers, setLeaderboardUsers] = useState<LeaderboardUser[]>(INITIAL_LEADERBOARD);
+  
+  const [userGpa, setUserGpa] = useState<number>(3.68);
+  const [userDrl, setUserDrl] = useState<number>(88);
+  const [userRank, setUserRank] = useState<number>(4);
+  const [userStreak, setUserStreak] = useState<number>(16);
+  const [userXp, setUserXp] = useState<number>(4850);
 
-  // Modals state
-  const [isAddTaskOpen, setIsAddTaskOpen] = useState(false);
-  const [isReplanOpen, setIsReplanOpen] = useState(false);
-  const [replanDiff, setReplanDiff] = useState<ReplanDiff | null>(null);
+  // Modals & Chat state
+  const [aiOptimizerOpen, setAiOptimizerOpen] = useState<boolean>(false);
+  const [chatOpen, setChatOpen] = useState<boolean>(false);
 
-  const [isFocusTimerOpen, setIsFocusTimerOpen] = useState(false);
-  const [activeFocusSession, setActiveFocusSession] = useState<StudySession | null>(null);
-
-  // Toast notification state
-  const [toast, setToast] = useState<{ title: string; message: string } | null>(null);
-
-  const showToast = (title: string, message: string) => {
-    setToast({ title, message });
-    setTimeout(() => {
-      setToast(null);
-    }, 4000);
+  // Switch Plan
+  const handleSelectPlan = (planId: string) => {
+    setActivePlanId(planId);
+    const plan = plans.find((p) => p.id === planId);
+    if (plan) {
+      setCourses(plan.courses);
+    }
   };
 
-  // Add Task Handler
-  const handleAddTask = (newTask: Task, autoSessions: StudySession[]) => {
-    setTasks((prev) => [newTask, ...prev]);
-    if (autoSessions.length > 0) {
-      setSessions((prev) => [...prev, ...autoSessions]);
-    }
-    showToast(
-      'Đã thêm nhiệm vụ & xếp lịch học',
-      `AI đã lên lịch các phiên học cho "${newTask.title}" bao quanh các tiết học cố định.`
+  // Apply plan from Gemini optimizer
+  const handleApplyAiPlan = (plan: SchedulePlan) => {
+    setPlans((prev) => [plan, ...prev]);
+    setActivePlanId(plan.id);
+    setCourses(plan.courses);
+  };
+
+  // Quick class code switcher from bottom course cards
+  const handleUpdateCourseClass = (courseCode: string, newClassCode: string) => {
+    setCourses((prev) =>
+      prev.map((c) => (c.code === courseCode ? { ...c, classCode: newClassCode } : c))
     );
   };
 
-  // Core Demo Moment & Re-plan Trigger
-  const handleTriggerReplan = async (
-    targetSession: StudySession,
-    reason: string = 'Bỏ lỡ khung giờ học đã lên lịch'
-  ) => {
-    // 1. Calculate deterministic baseline rebalance immediately
-    const diff = calculatePlannerRebalance({
-      missedSession: targetSession,
-      reason,
-      courses,
-      tasks,
-      preferences,
-      sessions,
-    });
-
-    setReplanDiff(diff);
-    setIsReplanOpen(true);
-
-    // 2. Fetch intelligent AI academic explanation via backend
-    try {
-      const response = await fetch('/api/replan', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          missedSession: targetSession,
-          reason,
-          courses,
-          tasks,
-          preferences,
-          sessions,
-        }),
-      });
-
-      const data = await response.json();
-      if (data?.aiRationale) {
-        setReplanDiff((prev) => (prev ? { ...prev, aiRationale: data.aiRationale } : prev));
-      }
-      if (data?.keyTakeaways && Array.isArray(data.keyTakeaways)) {
-        setReplanDiff((prev) => (prev ? { ...prev, keyAdjustments: data.keyTakeaways } : prev));
-      }
-    } catch (e) {
-      console.log('Using local Vietnamese planner engine');
-    }
-  };
-
-  // Trigger Demo Moment for the 14:30 CS 189 session
-  const handleSimulateDemoMissed = () => {
-    const todayStr = getTodayString();
-    const demoSession =
-      sessions.find((s) => s.date === todayStr && s.startTime === '14:30') ||
-      sessions.find((s) => s.date === todayStr && s.status === 'scheduled') ||
-      sessions[0];
-
-    if (demoSession) {
-      handleTriggerReplan(
-        demoSession,
-        'Sinh viên bận đột xuất và bỏ lỡ phiên học chiều môn Học máy (CS 189)'
-      );
-    }
-  };
-
-  // Apply Re-plan Action
-  const handleApplyReplan = (diff: ReplanDiff) => {
-    setSessions(diff.proposedSessions);
-    setIsReplanOpen(false);
-    showToast(
-      '⚡ Đã cập nhật kế hoạch học mới',
-      'Phiên ôn thi quan trọng đã được chuyển sang 19:30 tối nay. Các deadline được bảo vệ an toàn!'
+  // Toggle Subtask
+  const handleToggleSubtask = (deadlineId: string, subtaskId: string) => {
+    setDeadlines((prev) =>
+      prev.map((d) => {
+        if (d.id !== deadlineId) return d;
+        const newSubtasks = d.subtasks.map((st) =>
+          st.id === subtaskId ? { ...st, completed: !st.completed } : st
+        );
+        const completedCount = newSubtasks.filter((s) => s.completed).length;
+        const newProgress = Math.round((completedCount / newSubtasks.length) * 100);
+        return {
+          ...d,
+          subtasks: newSubtasks,
+          progress: newProgress,
+        };
+      })
     );
   };
 
-  // Focus Timer actions
-  const handleOpenFocusTimer = (session: StudySession) => {
-    setActiveFocusSession(session);
-    setIsFocusTimerOpen(true);
-  };
+  // Complete Deadline & Earn XP
+  const handleCompleteDeadline = (deadlineId: string) => {
+    const task = deadlines.find((d) => d.id === deadlineId);
+    if (!task || task.completed) return;
 
-  const handleCompleteSession = (sessionId: string) => {
-    const sessionToComplete = sessions.find((s) => s.id === sessionId);
-    if (!sessionToComplete) return;
-
-    setSessions((prev) =>
-      prev.map((s) => (s.id === sessionId ? { ...s, status: 'completed' as const } : s))
+    setDeadlines((prev) =>
+      prev.map((d) => (d.id === deadlineId ? { ...d, completed: true, progress: 100 } : d))
     );
 
-    // Đồng bộ sang Task: tăng completedMinutes và cập nhật status sang 'completed' khi xong
-    if (sessionToComplete.taskId) {
-      setTasks((prevTasks) =>
-        prevTasks.map((t) => {
-          if (t.id === sessionToComplete.taskId) {
-            const newMinutes = Math.min(t.estimatedMinutes, t.completedMinutes + sessionToComplete.durationMinutes);
-            // Kiểm tra xem tất cả session của task này đã xong chưa
-            const remainingPendingSessions = sessions.filter(
-              (s) => s.taskId === t.id && s.id !== sessionId && s.status !== 'completed'
-            );
-            const isCompleted = newMinutes >= t.estimatedMinutes || remainingPendingSessions.length === 0;
-
-            return {
-              ...t,
-              completedMinutes: newMinutes,
-              status: isCompleted ? 'completed' : 'in_progress',
-            };
-          }
-          return t;
-        })
-      );
-    }
-    showToast('Hoàn thành xuất sắc! 🎉', 'Đã ghi nhận tiến độ và hoàn thành bài tập.');
+    // Increase user XP
+    setUserXp((prev) => prev + task.xpReward);
   };
 
-  // Hoàn tác / Bỏ hoàn thành session
-  const handleUndoCompleteSession = (sessionId: string) => {
-    const sessionToUndo = sessions.find((s) => s.id === sessionId);
-    if (!sessionToUndo) return;
-
-    setSessions((prev) =>
-      prev.map((s) => (s.id === sessionId ? { ...s, status: 'scheduled' as const } : s))
-    );
-
-    if (sessionToUndo.taskId) {
-      setTasks((prevTasks) =>
-        prevTasks.map((t) => {
-          if (t.id === sessionToUndo.taskId) {
-            const newMinutes = Math.max(0, t.completedMinutes - sessionToUndo.durationMinutes);
-            return {
-              ...t,
-              completedMinutes: newMinutes,
-              status: newMinutes === 0 ? 'not_started' : 'in_progress',
-            };
-          }
-          return t;
-        })
-      );
-    }
-    showToast('Đã bỏ hoàn thành ↩️', 'Phiên học đã được chuyển về trạng thái chưa học.');
+  // Add new deadline
+  const handleAddNewDeadline = (newTask: Partial<DeadlineTask>) => {
+    const task: DeadlineTask = {
+      id: `dl-${Date.now()}`,
+      title: newTask.title || "Nhiệm vụ mới",
+      courseCode: newTask.courseCode || "CSE102",
+      courseName: newTask.courseName || "Môn học",
+      dueDate: newTask.dueDate || "2026-08-25T23:59:00",
+      hoursLeft: newTask.hoursLeft || 72,
+      importance: newTask.importance || "high",
+      isHighImpactProject: newTask.isHighImpactProject || false,
+      progress: 0,
+      xpReward: newTask.xpReward || 100,
+      completed: false,
+      subtasks: newTask.subtasks || [],
+    };
+    setDeadlines((prev) => [task, ...prev]);
   };
 
-  // Thêm buổi học bù / tự do
-  const handleAddCustomSession = (newSession: StudySession) => {
-    setSessions((prev) => [...prev, newSession]);
-    showToast('Đã thêm buổi học bù 📅', `Đã lưu phiên học vào lịch ngày ${newSession.date}.`);
+  // Add new document
+  const handleAddDoc = (newDoc: SmartDoc) => {
+    setDocs((prev) => [newDoc, ...prev]);
+    setUserXp((prev) => prev + 50); // +50 XP for sharing study material
   };
-
-  const handleMissFromTimer = (sessionId: string) => {
-    const session = sessions.find((s) => s.id === sessionId);
-    if (session) {
-      handleTriggerReplan(session, 'Sinh viên không thể hoàn thành phiên học');
-    }
-  };
-
-  // Reset to sample student data
-  const handleResetSampleData = () => {
-    setCourses(initialCourses);
-    setClassSchedule(initialClassSchedule);
-    setPreferences(initialPreferences);
-    setTasks(initialTasks);
-    setSessions(initialSessions);
-    showToast('Đã đặt lại dữ liệu mẫu', 'Khôi phục lịch học và bài tập mẫu của sinh viên CNTT.');
-  };
-
-  // Active focus task and course for timer modal
-  const activeFocusTask = tasks.find((t) => t.id === activeFocusSession?.taskId) || null;
-  const activeFocusCourse = courses.find((c) => c.id === activeFocusTask?.courseId) || null;
-
-  const pendingTasksCount = tasks.filter((t) => t.status !== 'completed').length;
 
   return (
-    <div className="min-h-screen bg-slate-50/70 text-slate-900 flex flex-col font-sans selection:bg-indigo-100 selection:text-indigo-900">
-      
-      {/* Toast Notification */}
-      {toast && (
-        <div className="fixed top-16 left-4 right-4 sm:left-auto sm:right-4 z-50 max-w-sm mx-auto bg-slate-900 text-white rounded-2xl p-3.5 shadow-2xl border border-indigo-500/30 animate-in slide-in-from-top-4 duration-300 flex items-start space-x-3">
-          <div className="w-7 h-7 rounded-xl bg-indigo-600 flex items-center justify-center shrink-0 mt-0.5">
-            <Sparkles className="w-3.5 h-3.5 text-white" />
-          </div>
-          <div className="flex-1">
-            <h4 className="text-xs font-bold text-white">
-              {toast.title}
-            </h4>
-            <p className="text-[11px] text-slate-300 mt-0.5 leading-relaxed">
-              {toast.message}
-            </p>
-          </div>
-          <button
-            onClick={() => setToast(null)}
-            className="text-slate-400 hover:text-white p-1"
-          >
-            <X className="w-4 h-4" />
-          </button>
-        </div>
-      )}
-
-      {/* Mobile Top Header */}
-      <MobileHeader
-        studentName={preferences.name || 'Minh Khoa'}
-        onOpenAddTask={() => setIsAddTaskOpen(true)}
-        onSimulateMissedSession={handleSimulateDemoMissed}
+    <div className="min-h-screen bg-[#F8FAFC] flex flex-col text-slate-900 antialiased font-sans">
+      {/* Top Header with compact navigation and profile trigger */}
+      <Header
+        activeTab={activeTab}
+        setActiveTab={setActiveTab}
+        gpa={userGpa}
+        drl={userDrl}
+        rank={userRank}
+        streak={userStreak}
+        xp={userXp}
       />
 
-      {/* Main Screen Router */}
-      <main className="flex-1">
-        {currentTab === 'home' && (
-          <HomeScreen
-            courses={courses}
-            tasks={tasks}
-            sessions={sessions}
-            classSchedule={classSchedule}
-            preferences={preferences}
-            onOpenFocusTimer={handleOpenFocusTimer}
-            onTriggerReplanForSession={handleTriggerReplan}
-            onCompleteSession={handleCompleteSession}
-            onUndoCompleteSession={handleUndoCompleteSession}
-            onNavigateTab={setCurrentTab}
-            onOpenAddTask={() => setIsAddTaskOpen(true)}
-            onSimulateDemoMissed={handleSimulateDemoMissed}
-          />
-        )}
+      {/* Main Content Layout with Left Sidebar + Page View */}
+      <div className="flex-1 flex max-w-[1600px] w-full mx-auto">
+        {/* Left Vertical Navigation Sidebar */}
+        <Sidebar
+          activeTab={activeTab}
+          setActiveTab={setActiveTab}
+          openAiChat={() => setChatOpen(true)}
+          streak={userStreak}
+        />
 
-        {currentTab === 'calendar' && (
-          <CalendarScreen
-            courses={courses}
-            tasks={tasks}
-            sessions={sessions}
-            classSchedule={classSchedule}
-            onOpenFocusTimer={handleOpenFocusTimer}
-            onTriggerReplanForSession={handleTriggerReplan}
-            onCompleteSession={handleCompleteSession}
-            onUndoCompleteSession={handleUndoCompleteSession}
-            onOpenAddTask={() => setIsAddTaskOpen(true)}
-            onAddCustomSession={handleAddCustomSession}
-          />
-        )}
+        {/* Dynamic View Area */}
+        <main className="flex-1 p-4 sm:p-6 lg:p-8 overflow-y-auto max-w-full">
+          {activeTab === "schedule" && (
+            <TimetableView
+              courses={courses}
+              plans={plans}
+              activePlanId={activePlanId}
+              onSelectPlan={handleSelectPlan}
+              onOpenAiOptimizer={() => setAiOptimizerOpen(true)}
+              onAddCourse={() => setAiOptimizerOpen(true)}
+              onUpdateCourseClass={handleUpdateCourseClass}
+            />
+          )}
 
-        {currentTab === 'ai_plan' && (
-          <AIPlanScreen
-            courses={courses}
-            tasks={tasks}
-            sessions={sessions}
-            preferences={preferences}
-            onOpenFocusTimer={handleOpenFocusTimer}
-            onTriggerReplanForSession={handleTriggerReplan}
-            onCompleteSession={handleCompleteSession}
-            onSimulateDemoMissed={handleSimulateDemoMissed}
-          />
-        )}
+          {activeTab === "deadlines" && (
+            <DeadlinesView
+              deadlines={deadlines}
+              onToggleSubtask={handleToggleSubtask}
+              onCompleteDeadline={handleCompleteDeadline}
+              onAddNewDeadline={handleAddNewDeadline}
+            />
+          )}
 
-        {currentTab === 'tasks' && (
-          <TasksScreen
-            courses={courses}
-            tasks={tasks}
-            setTasks={setTasks}
-            onOpenAddTask={() => setIsAddTaskOpen(true)}
-          />
-        )}
+          {activeTab === "gpa" && <ScholarshipAndGPAView />}
 
-        {currentTab === 'profile' && (
-          <ProfileScreen
-            preferences={preferences}
-            setPreferences={setPreferences}
-            courses={courses}
-            setCourses={setCourses}
-            classSchedule={classSchedule}
-            setClassSchedule={setClassSchedule}
-            onResetSampleData={handleResetSampleData}
-          />
-        )}
-      </main>
+          {activeTab === "drl" && <DRLView />}
 
-      {/* Bottom Navigation Bar */}
-      <BottomNav
-        currentTab={currentTab}
-        onSelectTab={setCurrentTab}
-        pendingTasksCount={pendingTasksCount}
-        onOpenAddTask={() => setIsAddTaskOpen(true)}
+          {activeTab === "docs" && <DocsView docs={docs} onAddDoc={handleAddDoc} />}
+
+          {activeTab === "leaderboard" && (
+            <LeaderboardView users={leaderboardUsers} currentUserXp={userXp} />
+          )}
+        </main>
+      </div>
+
+      {/* Gemini AI Schedule Optimizer Modal */}
+      <ScheduleOptimizerModal
+        isOpen={aiOptimizerOpen}
+        onClose={() => setAiOptimizerOpen(false)}
+        onApplyPlan={handleApplyAiPlan}
+        currentCourses={courses}
       />
 
-      {/* Add Task Modal / Bottom Sheet */}
-      <AddTaskModal
-        isOpen={isAddTaskOpen}
-        onClose={() => setIsAddTaskOpen(false)}
-        courses={courses}
-        preferences={preferences}
-        onAddTask={handleAddTask}
+      {/* Floating Gen Z AI Chat Assistant Button & Drawer */}
+      <GenZChatDrawer
+        isOpen={chatOpen}
+        onClose={() => setChatOpen(false)}
+        onOpen={() => setChatOpen(true)}
+        gpa={userGpa}
+        drl={userDrl}
+        streak={userStreak}
       />
-
-      {/* AI Re-plan Bottom Sheet */}
-      <ReplanBottomSheet
-        isOpen={isReplanOpen}
-        onClose={() => setIsReplanOpen(false)}
-        diff={replanDiff}
-        onApplyReplan={handleApplyReplan}
-      />
-
-      {/* Focus Timer Modal */}
-      <FocusTimerModal
-        isOpen={isFocusTimerOpen}
-        onClose={() => setIsFocusTimerOpen(false)}
-        session={activeFocusSession}
-        task={activeFocusTask}
-        course={activeFocusCourse}
-        onCompleteSession={handleCompleteSession}
-        onMissSession={handleMissFromTimer}
-      />
-
     </div>
   );
 }

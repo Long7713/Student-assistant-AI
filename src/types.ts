@@ -1,127 +1,84 @@
-export type Priority = 'high' | 'medium' | 'low';
-
-export type TaskType = 'assignment' | 'exam_prep' | 'reading' | 'project' | 'lab_report';
-
-export type SessionStatus = 'scheduled' | 'in_progress' | 'completed' | 'missed';
-
-export type DayOfWeek = 0 | 1 | 2 | 3 | 4 | 5 | 6; // 0=Sun, 1=Mon, ..., 6=Sat
-
 export interface Course {
   id: string;
   code: string;
   name: string;
-  color: string; // Tailwind color token or hex e.g. 'indigo', 'emerald', 'amber', 'rose', 'sky', 'purple'
+  classCode: string;
+  day: number; // 2 = Thứ 2, 3 = Thứ 3, ..., 7 = Thứ 7, 8 = CN
+  startPeriod: number; // 1 to 12
+  endPeriod: number;
+  room: string;
+  lecturer: string;
+  campus: string;
   credits: number;
-  professor?: string;
+  color: "emerald" | "teal" | "purple" | "rose" | "blue" | "amber" | "indigo";
+  note?: string;
+  isOnline?: boolean;
 }
 
-export interface ClassSchedule {
+export interface SchedulePlan {
   id: string;
-  courseId: string;
-  dayOfWeek: DayOfWeek;
-  startTime: string; // "09:30"
-  endTime: string;   // "11:00"
-  location?: string;
-  type: 'lecture' | 'lab' | 'discussion' | 'office_hours';
-}
-
-export interface StudyWindow {
-  id: string;
-  start: string; // "08:00"
-  end: string;   // "12:00"
-  label: string; // "Morning Focus"
-  days: DayOfWeek[];
-}
-
-export interface StudentPreferences {
   name: string;
-  major: string;
-  university: string;
-  studyWindows: StudyWindow[];
-  maxDailyStudyHours: number;
-  preferredSessionLength: number; // in minutes e.g. 60 or 90
-  breakLength: number; // minutes
-  peakFocusTime: 'morning' | 'afternoon' | 'evening';
-  isOnboarded: boolean;
+  gpaImpact: string;
+  description: string;
+  courses: Course[];
 }
 
-export interface Subtask {
+export interface DeadlineTask {
   id: string;
   title: string;
+  courseCode: string;
+  courseName: string;
+  dueDate: string; // ISO or relative
+  hoursLeft: number;
+  importance: "high" | "medium" | "low";
+  isHighImpactProject?: boolean; // Pinned in Focus Zone (e.g. Đồ án, NCKH)
+  progress: number; // 0 - 100
+  subtasks: { id: string; title: string; completed: boolean }[];
+  xpReward: number;
   completed: boolean;
 }
 
-export interface Task {
+export interface SmartDoc {
   id: string;
-  courseId: string;
   title: string;
-  description?: string;
-  type: TaskType;
-  deadline: string; // ISO date string e.g. "2026-08-18T23:59"
-  estimatedMinutes: number;
-  completedMinutes: number;
-  priority: Priority;
-  difficulty: 1 | 2 | 3 | 4 | 5;
-  status: 'not_started' | 'in_progress' | 'completed';
-  subtasks?: Subtask[];
-  createdAt: string;
+  subject: string;
+  subjectCode: string;
+  category: "Đề thi & Lời giải" | "Slide bài giảng" | "Giáo trình" | "Tóm tắt ôn tập";
+  author: string;
+  tags: string[];
+  academicYear: string;
+  summary: string;
+  fileSize: string;
+  fileType: "pdf" | "docx" | "pptx";
+  uploadDate: string;
+  downloads: number;
+  likes: number;
+  gcsUri: string;
+  embeddingVectorId?: string;
 }
-export interface StudySession {
+
+export interface LeaderboardUser {
+  rank: number;
   id: string;
-  taskId?: string;
-  courseId?: string;
+  name: string;
+  avatar: string;
+  university: string;
+  major: string;
+  tier: "Đồng" | "Bạc" | "Vàng" | "Bạch Kim" | "Kim Cương" | "Cao Thủ";
+  xp: number;
+  streakDays: number;
+  completedDeadlines: number;
+  gpa: number;
+  badges: string[];
+}
+
+export interface DRLEvent {
+  id: string;
+  title: string;
+  category: string;
+  drlPoints: number;
   date: string;
-  startTime: string;
-  endTime: string;
-  durationMinutes: number;
-  status: SessionStatus;
-  goal: string;
-  missedReason?: string;
-  replanTag?: string;
+  location: string;
+  status: "upcoming" | "registered" | "completed";
+  organizer: string;
 }
-
-export interface SessionChange {
-  id: string;
-  type: 'moved' | 'rescheduled_tomorrow' | 'split' | 'added' | 'extended' | 'deprioritized';
-  taskId: string;
-  taskTitle: string;
-  courseCode: string;
-  courseColor: string;
-  priority: Priority;
-  previousSession?: {
-    date: string;
-    startTime: string;
-    endTime: string;
-  };
-  newSession?: {
-    date: string;
-    startTime: string;
-    endTime: string;
-  };
-  explanation: string;
-  urgencyImpact: 'protected_high_priority' | 'safely_deferred' | 'balanced_workload';
-}
-
-export interface ReplanDiff {
-  id: string;
-  timestamp: string;
-  triggerSessionId?: string;
-  triggerReason: string;
-  aiRationale: string;
-  workloadSummary: {
-    todayHoursBefore: number;
-    todayHoursAfter: number;
-    tomorrowHours: number;
-    deadlinesSafeCount: number;
-    atRiskCount: number;
-  };
-  keyAdjustments: string[];
-  changes: SessionChange[];
-  beforeSessions: StudySession[];
-  proposedSessions: StudySession[];
-}
-
-export type NavigationTab = 'home' | 'calendar' | 'ai_plan' | 'tasks' | 'discover' | 'profile';
-
-export type ActiveScreen = 'onboarding' | 'dashboard' | 'add_task' | 'replan_modal';
-
