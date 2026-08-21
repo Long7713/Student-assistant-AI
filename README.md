@@ -25,52 +25,23 @@ View your app in AI Studio: https://ai.studio/apps/24b67902-7da8-426c-846a-9eddf
 ## 📌 2. Sơ Đồ Luồng Dữ Liệu (Data Flow Diagram - DFD)
 
 ### 2.1 Sơ đồ luồng dữ liệu tổng quan (Level 0 DFD)
-
-
-graph TD
+```graph TD
     User([Sinh viên / User]) <--> MobileApp[EduMind AI Mobile App]
-    
     subgraph Google Cloud Ecosystem
         MobileApp <--> Firebase[(Firebase / Firestore DB)]
         MobileApp <--> GeminiAPI[Gemini 1.5 Flash / Pro API]
         MobileApp <--> GCS[Google Cloud Storage]
         MobileApp <--> VertexAI[Vertex AI Embeddings]
-    end
-    
+    end 
     subgraph Google Workspace Ecosystem
         MobileApp <--> GCalendar[Google Calendar API]
     end
----
+```
+
 
 ## 📅 Lịch Triển Khai Chi Tiết
 # 🚀 Kế Hoạch Triển Khai Cấp Tốc
 
-<<<<<<< HEAD
->>Báo trong mess mình làm phần nào, sau đó làm phần nào commit vào rồi đánh dấu "+" vào
-
-
-| Ngày & Thời Gian | Hạng Mục Công Việc | Chi Tiết Thực Hiện | Deliverables / Output |
-| :--- | :--- | :--- | :--- |
-| **Day 1**<br>*(14/08/2026)* | **Khởi tạo & Kiến trúc** | - Thiết lập Repo Github, Flutter/React Native base project.<br>- Khởi tạo Firebase Project & Google Cloud Platform (GCP) Console.<br>- Thiết kế Database Schema trên Firestore (Users, Schedules, Tasks, Docs). | - Base Source Code Structure.<br>- Firestore Database Rules & Collection Schema. |
-| **Day 2**<br>*(15/08/2026)* | **Authentication & Calendar API** | - Tích hợp Google Sign-In.<br>- Cấu hình OAuth2 for Google Calendar API.<br>- Viết Service đọc/ghi sự kiện lên Google Calendar người dùng. | - Đăng nhập Google thành công.<br>- Sync 2 chiều giữa App và Google Calendar. |
-| **Day 3**<br>*(16/08/2026)* | **Quản lý Lịch học (UI Core)** | - Màn hình Lịch di động (Daily / Weekly / Monthly View).<br>- Chức năng CRUD giờ học do sinh viên tự nhập & chỉnh sửa linh hoạt.<br>- Cảnh báo trực quan màu sắc cho giờ gốc vs giờ đã chỉnh sửa. | - Màn hình Calendar chạy mượt trên Mobile.<br>- Người dùng thêm/sửa/xóa buổi học thành công. |
-| **Day 4**<br>*(17/08/2026)* | **Tích hợp Gemini 1.5 - Parser** | - Kết nối Gemini API Key qua Firebase Vertex AI SDK / REST API.<br>- Viết prompt cho Gemini đọc input đăng ký môn thô (Natural Text -> Clean JSON). | - API Service parse tin nhắn đăng ký môn thành JSON dữ liệu. |
-| **Day 5**<br>*(18/08/2026)* | **Gemini Xếp Lịch & Check Trùng** | - Áp dụng System Prompt xếp lịch.<br>- Xử lý logic phát hiện trùng giờ và trả về 2-3 phương án tự động xếp lịch. | - AI trả lời thời gian thực, hiển thị các lựa chọn lịch gợi ý lên UI để sinh viên click chọn. |
-| **Day 6**<br>*(19/08/2026)* | **Thuật toán Deadline Động** | - Xây dựng UI danh sách Deadline dạng Kanban / Priority List.<br>- Cài đặt thuật toán ưu tiên theo Thời gian còn lại + Độ quan trọng.<br>- Xây dựng khu vực "Focus Zone" cho dự án dài hạn. | - Danh sách Deadline tự động nhảy thứ tự theo thời gian thực.<br>- Sub-tasks checklist hoạt động. |
-| **Day 7**<br>*(20/08/2026)* | **Kho Tài liệu & Google Cloud Storage** | - Tích hợp UI Upload File (PDF, DOCX, Image).<br>- Tải file lên Google Cloud Storage Bucket.<br>- Lưu trữ metadata ban đầu vào Firestore. | - File upload thành công lên GCS Bucket.<br>- Hiển thị danh sách file theo danh mục/tác giả. |
-| **Day 8**<br>*(21/08/2026)* | **AI Chống Trùng Lặp & Vector Search** | - Tích hợp Vertex AI Text Embeddings API.<br>- Tạo embedding cho file mới và so sánh Cosine Similarity với kho hiện tại.<br>- Cảnh báo trùng lặp file trước khi ghi đè. | - Feature cảnh báo trùng lặp tài liệu hoạt động chính xác.<br>- Tìm kiếm tài liệu bằng ngữ nghĩa (Semantic Search). |
-| **Day 9**<br>*(22/08/2026)* | **Gamification & Leaderboard** | - Thiết kế công thức cộng điểm XP (Hoàn thành deadline, đóng góp tài liệu).<br>- Xây dựng Bảng xếp hạng (Rank Tuần/Tháng) hiển thị thứ hạng bạn bè.<br>- Hệ thống Badge/Huy hiệu thành tích. | - Màn hình Leaderboard cập nhật XP realtime.<br>- Thông báo chúc mừng khi lên cấp. |
-| **Day 10**<br>*(23/08/2026)* | **UI/UX Polish & Dark Mode** | - Chuẩn hóa Material Design 3 / Google Theme.<br>- Hỗ trợ Dark Mode, Responsive layout cho nhiều kích thước màn hình.<br>- Thêm micro-animations khi hoàn thành task. | - App đạt chuẩn UI/UX thẩm mỹ cao.<br>- Trải nghiệm mượt mà không bị giật lag. |
-| **Day 11**<br>*(24/08/2026)* | **Integration & End-to-End Testing** | - Kiểm thử toàn bộ luồng từ Đăng ký môn -> AI xếp lịch -> Sync Calendar -> Làm Deadline -> Tích điểm.<br>- Xử lý các edge cases (mất mạng, token hết hạn, input AI bất thường). | - Bản Build APK/iOS mượt mà, hạn chế tối đa crash/error. |
-| **Day 12**<br>*(25/08/2026)* | **Tối ưu hóa Chi phí GCP & Performance** | - Cấu hình Caching cho Gemini API requests.<br>- Tối ưu hóa Security Rules cho Firestore & Cloud Storage.<br>- Giảm dung lượng file build. | - Báo cáo performance & ngân sách API khả thi. |
-| **Day 13**<br>*(26/08/2026)* | **Quay Video Demo & Làm Slide Pitch** | - Quay Video Demo 3 phút thể hiện nổi bật 5 chức năng cốt lõi và hệ sinh thái Google.<br>- Soạn thảo Slide thuyết trình tập trung vào bài toán sinh viên & giá trị AI. | - Video Demo HD có phụ đề.<br>- Slide Pitch Deck chuyên nghiệp. |
-| **Day 14**<br>*(27/08 - 29/08)* | **Rà soát & Nộp Bài Cuộc Thi** | - Kiểm tra toàn bộ link Github, tài liệu README, Video Demo.<br>- Dự phòng khắc phục sự cố hệ thống submission (nếu có).<br>- Nộp bài lên Portal cuộc thi Google AI / Hackathon. | - **Hoàn tất thủ tục nộp bài chính thức trước ngày 30/08/2026.** |
-=======
-> **Sprint Duration:** 9 ngày
-> **Thời gian:** 21/08/2026 → 29/08/2026
-> **Mục tiêu:** Hoàn thiện sản phẩm, kiểm thử end-to-end, chuẩn bị Pitch Deck, Video Demo và nộp bài chính thức.
-
----
 
 ## 📅 Sprint Timeline
 
