@@ -71,13 +71,13 @@ Hoàn thiện khả năng tìm kiếm ngữ nghĩa và phát hiện nội dung t
 
 ### Công việc
 
- + Tích hợp Embeddings API.(Long)
- + Thiết kế pipeline tạo và lưu embeddings.(Long)
- + Cấu hình `pgvector` trên Supabase.(Long)
- + Viết logic Vector Similarity Search.(Long)
- + Xây dựng cơ chế phát hiện nội dung/tài liệu trùng lặp.(Long)
- + Hoàn thiện Semantic Search.(Long)
- + Kiểm thử độ chính xác của kết quả tìm kiếm.(Long)
+ + Tích hợp Embeddings API.(Long)+
+ + Thiết kế pipeline tạo và lưu embeddings.(Long)+
+ + Cấu hình `pgvector` trên Supabase.(Long)+
+ + Viết logic Vector Similarity Search.(Long)+
+ + Xây dựng cơ chế phát hiện nội dung/tài liệu trùng lặp.(Long)+
+ + Hoàn thiện Semantic Search.(Long)+
+ + Kiểm thử độ chính xác của kết quả tìm kiếm.(Long)+
 
 ### Deliverables
 
