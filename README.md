@@ -71,13 +71,19 @@ Hoàn thiện khả năng tìm kiếm ngữ nghĩa và phát hiện nội dung t
 
 ### Công việc
 
- +(Long) Tích hợp Embeddings API.(Long)+
- +(Long) Thiết kế pipeline tạo và lưu embeddings.(Long)+
- +(Long) Cấu hình `pgvector` trên Supabase.(Long)+
- +(Long) Viết logic Vector Similarity Search.(Long)+
- +(Long) Xây dựng cơ chế phát hiện nội dung/tài liệu trùng lặp.(Long)+
- +(Long) Hoàn thiện Semantic Search.(Long)+
- +(Long) Kiểm thử độ chính xác của kết quả tìm kiếm.(Long)+
+ +(Long) Tích hợp Embeddings API.(Long)
+ 
+ +(Long) Thiết kế pipeline tạo và lưu embeddings.(Long)
+ 
+ +(Long) Cấu hình `pgvector` trên Supabase.(Long)
+ 
+ +(Long) Viết logic Vector Similarity Search.(Long)
+ 
+ +(Long) Xây dựng cơ chế phát hiện nội dung/tài liệu trùng lặp.(Long)
+ 
+ +(Long) Hoàn thiện Semantic Search.(Long)
+ 
+ +(Long) Kiểm thử độ chính xác của kết quả tìm kiếm.(Long)
 
 ### Deliverables
 
@@ -98,12 +104,19 @@ Xây dựng hệ thống ưu tiên công việc và tăng động lực học t�
 ### Công việc
 
 +(Long)Thiết kế thuật toán `Priority Score`.
+
 +(Long)Tính toán độ khẩn cấp dựa trên deadline.
+
 +(Long)Kết hợp workload, mức độ quan trọng và thời gian còn lại.
+
 +(Long)Xây dựng UI **Focus Zone**.
+
 +(Long)Tích hợp hệ thống XP.
+
 +(Long)Xây dựng cơ chế tăng XP khi hoàn thành nhiệm vụ.
+
 +(Long)Xây dựng Leaderboard.
+
 +(Long)Kiểm thử logic gamification.
 
 ### Deliverables
@@ -126,13 +139,21 @@ Xây dựng hệ thống ưu tiên công việc và tăng động lực học t�
 ### Công việc
 
 +(Long)Chuẩn hóa Design System theo Material Design 3.
+
 +(Long)Đồng bộ typography, spacing và component.
+
 +(Long)Hoàn thiện Dark Mode.
+
 +(Long)Thêm micro-interactions.
+
 +(Long)Thêm loading states và empty states.
+
 +(Long)Kiểm tra responsive trên Mobile.
+
 +(Long)Kiểm tra responsive trên Tablet.
+
 +(Long)Kiểm tra responsive trên Desktop.
+
 +(Long)Fix các lỗi UI/UX còn tồn đọng.
 
 ### Deliverables
@@ -177,14 +198,23 @@ Hoàn thành nhiệm vụ & nhận XP
 ### Công việc
 
 +(Long)Test Authentication Flow.
+
 +(Long)Test Course Registration Flow.
+
 +(Long)Test AI Scheduling.
+
 +(Long)Test Dynamic Deadline.
+
 +(Long)Test Calendar Sync.
+
 +(Long)Test File Upload.
+
 +(Long)Test Vector Search.
+
 +(Long)Test Gamification.
+
 +(Long)Test Error Handling.
+
 +(Long)Fix các critical bugs.
 
 ### Deliverables
@@ -205,12 +235,19 @@ Tối ưu hiệu năng, chi phí AI API và bảo mật hệ thống.
 ### Công việc
 
 +(Long)Cấu hình caching cho AI/Gemini API requests.
+
 +(Long)Tránh gửi lại các request AI không cần thiết.
+
 +(Long)Tối ưu database queries.
+
 +(Long)Kiểm tra index cho các bảng quan trọng.
+
 +(Long)Rà soát Supabase Row Level Security (RLS).
+
 +(Long)Kiểm tra quyền truy cập dữ liệu người dùng.
+
 +(Long)Kiểm tra API keys và environment variables.
+
 +(Long)Test performance trên các luồng chính.
 
 ### Deliverables
