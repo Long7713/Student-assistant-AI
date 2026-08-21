@@ -82,3 +82,63 @@ export interface DRLEvent {
   status: "upcoming" | "registered" | "completed";
   organizer: string;
 }
+
+// API Types & Payloads
+export interface ApiResponse<T = any> {
+  success: boolean;
+  error?: string;
+  data?: T;
+}
+
+export interface ScheduleConflict {
+  courseA: string;
+  courseB: string;
+  description: string;
+  severity: "high" | "medium";
+}
+
+export interface ScheduleOptimizerResponse {
+  success: boolean;
+  analysis?: string;
+  conflicts?: ScheduleConflict[];
+  suggestedPlans?: SchedulePlan[];
+  error?: string;
+}
+
+export interface DocMetadata {
+  title: string;
+  subject: string;
+  category: "Đề thi & Lời giải" | "Slide bài giảng" | "Giáo trình" | "Tóm tắt ôn tập";
+  author: string;
+  tags: string[];
+  academicYear: string;
+  summary: string;
+}
+
+export interface DocDuplicateCheck {
+  isDuplicate: boolean;
+  similarityScore: number;
+  duplicateWith?: {
+    id: string;
+    title: string;
+    matchReason: string;
+  };
+}
+
+export interface DocAnalyzeResponse {
+  success: boolean;
+  metadata?: DocMetadata;
+  duplicateCheck?: DocDuplicateCheck;
+  error?: string;
+}
+
+export interface SemanticSearchResponse {
+  success: boolean;
+  results: (SmartDoc & { score?: number })[];
+}
+
+export interface ChatResponse {
+  reply: string;
+  success?: boolean;
+}
+

@@ -5,33 +5,35 @@ import {
   Users, 
   Trophy, 
   Flame, 
-  Sparkles,
-  BookOpen,
-  CheckSquare,
-  User,
-  ChevronDown
+  BookOpen, 
+  CheckSquare, 
+  ChevronDown 
 } from "lucide-react";
 import { ProfileModal } from "./ProfileModal";
+import { useApp } from "../context/AppContext";
 
 interface HeaderProps {
-  activeTab: string;
-  setActiveTab: (tab: string) => void;
-  gpa: number;
-  drl: number;
-  rank: number;
-  streak: number;
+  activeTab?: string;
+  setActiveTab?: (tab: string) => void;
+  gpa?: number;
+  drl?: number;
+  rank?: number;
+  streak?: number;
   xp?: number;
 }
 
-export const Header = ({
-  activeTab,
-  setActiveTab,
-  gpa,
-  drl,
-  rank,
-  streak,
-  xp = 2450,
-}: HeaderProps) => {
+export const Header = (props: HeaderProps) => {
+  const app = useApp();
+
+  const activeTab = props.activeTab ?? app.activeTab;
+  const setActiveTab = props.setActiveTab ?? app.setActiveTab;
+  const userProfile = app.userProfile;
+  const gpa = props.gpa ?? userProfile.gpa;
+  const drl = props.drl ?? userProfile.drl;
+  const rank = props.rank ?? userProfile.rank;
+  const streak = props.streak ?? userProfile.streak;
+  const xp = props.xp ?? userProfile.xp;
+
   const [isProfileOpen, setIsProfileOpen] = useState(false);
 
   const tabs = [
@@ -51,16 +53,20 @@ export const Header = ({
           <div className="flex items-center gap-3 shrink-0">
             <div className="flex items-center gap-2">
               <div className="w-8 h-8 rounded-lg bg-slate-900 text-white flex items-center justify-center font-black text-sm shadow-2xs">
-                EM
+                GZ
               </div>
               <div>
                 <div className="flex items-center gap-1.5 leading-none">
-                  <span className="text-sm font-bold text-slate-900 tracking-tight">EduMind AI</span>
+                  <span className="text-sm font-bold text-slate-900 tracking-tight">
+                    GenZ Study
+                  </span>
                   <span className="bg-slate-100 text-slate-600 border border-slate-200 text-[9px] font-semibold px-1.5 py-0.2 rounded font-mono">
-                    ĐHQG
+                    AI
                   </span>
                 </div>
-                <span className="text-[10px] text-slate-400 font-medium">Trợ lý học tập thông minh</span>
+                <span className="text-[10px] text-slate-400 font-medium">
+                  Trợ lý học tập thông minh
+                </span>
               </div>
             </div>
           </div>
@@ -81,7 +87,11 @@ export const Header = ({
                       : "text-slate-600 hover:bg-slate-100 hover:text-slate-900"
                   }`}
                 >
-                  <Icon className={`w-3.5 h-3.5 ${isActive ? "text-emerald-400" : "text-slate-400"}`} />
+                  <Icon
+                    className={`w-3.5 h-3.5 ${
+                      isActive ? "text-emerald-400" : "text-slate-400"
+                    }`}
+                  />
                   <span>{tab.label}</span>
                 </button>
               );
@@ -105,18 +115,18 @@ export const Header = ({
             >
               <div className="relative">
                 <img
-                  src="https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?w=150&auto=format&fit=crop&q=80"
-                  alt="Nam Trần"
+                  src={userProfile.avatar}
+                  alt={userProfile.name}
                   className="w-7 h-7 rounded-full border border-slate-200 object-cover"
                 />
                 <span className="absolute bottom-0 right-0 w-2 h-2 bg-emerald-500 border border-white rounded-full"></span>
               </div>
               <div className="hidden sm:block text-left">
                 <div className="text-xs font-bold text-slate-900 leading-tight flex items-center gap-1">
-                  <span>Nam Trần</span>
+                  <span>{userProfile.name}</span>
                   <ChevronDown className="w-3 h-3 text-slate-400 group-hover:text-slate-700 transition-transform" />
                 </div>
-                <div className="text-[10px] text-slate-500">K23 • Khoa CNTT</div>
+                <div className="text-[10px] text-slate-500">{userProfile.faculty}</div>
               </div>
             </button>
           </div>
@@ -132,9 +142,7 @@ export const Header = ({
                 key={tab.id}
                 onClick={() => setActiveTab(tab.id)}
                 className={`flex items-center gap-1 px-2.5 py-1 rounded-md text-[11px] font-semibold whitespace-nowrap cursor-pointer ${
-                  isActive
-                    ? "bg-slate-900 text-white"
-                    : "text-slate-600 hover:bg-slate-100"
+                  isActive ? "bg-slate-900 text-white" : "text-slate-600 hover:bg-slate-100"
                 }`}
               >
                 <Icon className="w-3 h-3" />
@@ -159,4 +167,3 @@ export const Header = ({
     </>
   );
 };
-

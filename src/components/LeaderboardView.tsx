@@ -2,24 +2,24 @@ import { useState } from "react";
 import { 
   Trophy, 
   Flame, 
-  Award, 
-  Medal, 
-  Star, 
   Crown, 
-  TrendingUp, 
   Gift, 
-  CheckCircle2,
-  Users,
-  Sparkles
+  Users, 
 } from "lucide-react";
 import { LeaderboardUser } from "../types";
+import { useApp } from "../context/AppContext";
 
 interface LeaderboardViewProps {
-  users: LeaderboardUser[];
-  currentUserXp: number;
+  users?: LeaderboardUser[];
+  currentUserXp?: number;
 }
 
-export const LeaderboardView = ({ users, currentUserXp }: LeaderboardViewProps) => {
+export const LeaderboardView = (props: LeaderboardViewProps) => {
+  const { userProfile, leaderboardUsers } = useApp();
+
+  const users = props.users ?? leaderboardUsers;
+  const currentUserXp = props.currentUserXp ?? userProfile.xp;
+
   const [filterPeriod, setFilterPeriod] = useState<"week" | "month" | "all">("week");
   const [activeTabSub, setActiveTabSub] = useState<"ranking" | "rewards">("ranking");
 
@@ -42,9 +42,9 @@ export const LeaderboardView = ({ users, currentUserXp }: LeaderboardViewProps) 
     },
     {
       id: "rew-3",
-      title: "Bộ Huy Hiệu & Áo Thun Hoodie EduMind AI Gen Z",
+      title: "Bộ Huy Hiệu & Áo Thun Hoodie GenZ Study",
       cost: 3000,
-      sponsor: "EduMind x Google Developer Student Club",
+      sponsor: "GenZ Study x Google Developer Student Club",
       icon: "👕",
       claimed: false,
     },

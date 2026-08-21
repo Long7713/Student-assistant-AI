@@ -1,5 +1,5 @@
 {
-  "name": "EduMind AI - Study & Schedule Hub",
+  "name": "GenZ Study",
   "description": "Nền tảng quản lý thời khóa biểu thông minh, deadline động và kho tài liệu tích hợp Google Ecosystem & Gemini AI",
   "requestFramePermissions": [],
   "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]

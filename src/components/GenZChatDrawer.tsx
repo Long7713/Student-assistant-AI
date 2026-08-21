@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useRef, useEffect } from "react";
 import { 
   Sparkles, 
   Send, 
@@ -7,196 +7,246 @@ import {
   Loader2, 
   Flame, 
   Calendar, 
-  GraduationCap,
-  MessageSquare
+  GraduationCap 
 } from "lucide-react";
+import { chatService } from "../services/chatService";
+import { formatCurrentTime } from "../utils/formatters";
+import { useApp } from "../context/AppContext";
 
 interface GenZChatDrawerProps {
-  isOpen: boolean;
-  onClose: () => void;
-  onOpen: () => void;
-  gpa: number;
-  drl: number;
-  streak: number;
+  isOpen?: boolean;
+  onClose?: () => void;
+  onOpen?: () => void;
+  gpa?: number;
+  drl?: number;
+  streak?: number;
 }
 
-export const GenZChatDrawer = ({
-  isOpen,
-  onClose,
-  onOpen,
-  gpa,
-  drl,
-  streak,
-}: GenZChatDrawerProps) => {
-  const [messages, setMessages] = useState<Array<{ sender: "ai" | "user"; text: string; time: string }>>([
+export const GenZChatDrawer = (props: GenZChatDrawerProps) => {
+  const app = useApp();
+
+  const isOpen = props.isOpen ?? app.chatOpen;
+  const onClose = props.onClose ?? (() => app.setChatOpen(false));
+  const onOpen = props.onOpen ?? (() => app.setChatOpen(true));
+  const gpa = props.gpa ?? app.userProfile.gpa;
+  const drl = props.drl ?? app.userProfile.drl;
+  const streak = props.streak ?? app.userProfile.streak;
+
+  const [messages, setMessages] = useState<
+    Array<{ sender: "ai" | "user"; text: string; time: string }>
+  >([
     {
       sender: "ai",
-      text: `Yo Nam! 👋 Mình là AI Gen Z trợ lý của EduMind 🚀. Hiện tại mình thấy bạn đang có GPA 3.68 (Top 4 toàn trường) và chuỗi ${streak} ngày cày cuốc liên tục! Bạn cần mình tư vấn xếp lại lịch học, check deadline gấp hay bí kíp kéo môn nào không? ✨`,
+      text: `Yo Nam! 👋 Mình là AI Gen Z trợ lý của GenZ Study 🚀. Hiện tại mình thấy bạn đang có GPA ${gpa.toFixed(
+        2
+      )} (Top ${app.userProfile.rank} toàn trường) và chuỗi ${streak} ngày cày cuốc liên tục! Bạn cần mình tư vấn xếp lại lịch học, check deadline gấp hay bí kíp kéo môn nào không? ✨`,
       time: "Vừa xong",
     },
   ]);
   const [inputMessage, setInputMessage] = useState<string>("");
   const [loading, setLoading] = useState<boolean>(false);
+  const abortControllerRef = useRef<AbortController | null>(null);
+
+  useEffect(() => {
+    return () => {
+      if (abortControllerRef.current) {
+        abortControllerRef.current.abort();
+      }
+    };
+  }, []);
 
   const handleSendMessage = async () => {
-    if (!inputMessage.trim()) return;
+    if (!inputMessage.trim() || loading) return;
 
-    const userText = inputMessage;
-    const nowTime = new Date().toLocaleTimeString("vi-VN", { hour: "2-digit", minute: "2-digit" });
+    const userText = inputMessage.trim();
+    const nowTime = formatCurrentTime();
 
     setMessages((prev) => [...prev, { sender: "user", text: userText, time: nowTime }]);
     setInputMessage("");
     setLoading(true);
 
+    if (abortControllerRef.current) {
+      abortControllerRef.current.abort();
+    }
+    abortControllerRef.current = new AbortController();
+
     try {
-      const response = await fetch("/api/gemini/chat", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          message: userText,
-          context: { gpa, drl, streak, school: "ĐHQG-HCM" },
-        }),
-      });
-
-      const data = await response.json();
-      const aiReply = data.reply || "Đã nhận câu hỏi của bạn! Chúc bạn học tốt nhé 🌟";
-
-      setMessages((prev) => [
-        ...prev,
+      const data = await chatService.sendMessage(
+        userText,
         {
-          sender: "ai",
-          text: aiReply,
-          time: new Date().toLocaleTimeString("vi-VN", { hour: "2-digit", minute: "2-digit" }),
+          gpa,
+          drl,
+          streak,
+          upcomingDeadlines: "Báo cáo Lab 3 - Cấu trúc Dữ liệu (Hạn 12 giờ nữa)",
         },
-      ]);
-    } catch (err) {
-      console.error(err);
-      setMessages((prev) => [
-        ...prev,
-        {
-          sender: "ai",
-          text: "Mạng hơi chập chờn xíu, bạn thử nhắn lại cho mình nha! 🔥",
-          time: "Vừa xong",
-        },
-      ]);
+        abortControllerRef.current.signal
+      );
+
+      if (data.success && data.reply) {
+        setMessages((prev) => [
+          ...prev,
+          {
+            sender: "ai",
+            text: data.reply,
+            time: formatCurrentTime(),
+          },
+        ]);
+      } else {
+        setMessages((prev) => [
+          ...prev,
+          {
+            sender: "ai",
+            text: "Ủa lag xíu rùi bro ơi 🥺 Server đang bận xíu, xíu nữa hỏi lại tui nha!",
+            time: formatCurrentTime(),
+          },
+        ]);
+      }
+    } catch (err: any) {
+      if (err.name !== "AbortError") {
+        setMessages((prev) => [
+          ...prev,
+          {
+            sender: "ai",
+            text: "Mạng bị chập chờn rùi ông ơi! Kiểm tra kết nối mạng xíu nha 📶",
+            time: formatCurrentTime(),
+          },
+        ]);
+      }
     } finally {
       setLoading(false);
     }
   };
 
-  const sampleChips = [
-    "Lịch học hôm nay có môn gì?",
-    "Làm sao kéo GPA từ 3.68 lên 3.80?",
-    "Check deadline dưới 48 giờ",
-    "Gợi ý tài liệu ôn thi CTDL",
-  ];
-
   return (
     <>
-      {/* Floating Action Button (Matches Screenshot: HỎI AI GEN Z ✨) */}
+      {/* Floating Trigger Button */}
       {!isOpen && (
         <button
-          id="btn-floating-ai-genz"
           onClick={onOpen}
-          className="fixed bottom-6 right-6 z-40 bg-slate-900 hover:bg-slate-800 text-white font-semibold text-xs px-4 py-2.5 rounded-lg shadow-md flex items-center gap-2 border border-slate-700 hover:scale-102 transition-all cursor-pointer group"
+          className="fixed bottom-6 right-6 z-40 bg-slate-900 hover:bg-slate-800 text-white rounded-full p-3.5 shadow-lg flex items-center gap-2.5 transition-all group hover:scale-105 cursor-pointer border border-slate-700"
+          title="Mở GenZ Study AI Chatbot"
         >
-          <div className="w-5 h-5 rounded-md bg-white/10 text-white flex items-center justify-center">
-            <Bot className="w-3.5 h-3.5" />
+          <div className="relative">
+            <Bot className="w-5 h-5 text-emerald-400" />
+            <span className="absolute -top-1 -right-1 w-2.5 h-2.5 bg-emerald-500 rounded-full border border-slate-900"></span>
           </div>
-          <span className="tracking-wide">HỎI AI GEN Z</span>
-          <Sparkles className="w-3.5 h-3.5 text-amber-400" />
+          <span className="text-xs font-semibold pr-1">Hỏi AI Gen Z ✨</span>
         </button>
       )}
 
-      {/* Floating Chat Window */}
+      {/* Slide-over Drawer */}
       {isOpen && (
-        <div className="fixed bottom-6 right-6 z-50 w-full max-w-sm sm:max-w-md bg-white rounded-2xl shadow-xl border border-slate-200 flex flex-col overflow-hidden animate-in slide-in-from-bottom-5 duration-200 max-h-[580px] h-[580px]">
-          {/* Chat Header */}
-          <div className="p-4 bg-slate-900 text-white flex items-center justify-between">
-            <div className="flex items-center gap-2.5">
-              <div className="relative">
-                <div className="w-8 h-8 rounded-lg bg-white/10 text-white flex items-center justify-center font-bold text-xs shadow-xs">
-                  <Bot className="w-4 h-4" />
+        <div className="fixed inset-0 z-50 overflow-hidden bg-slate-900/30 backdrop-blur-xs flex justify-end animate-in fade-in duration-200">
+          <div className="w-full max-w-md bg-white h-full shadow-2xl flex flex-col justify-between border-l border-slate-200 animate-in slide-in-from-right duration-300">
+            {/* Drawer Header */}
+            <div className="p-4 bg-slate-900 text-white flex items-center justify-between border-b border-slate-800">
+              <div className="flex items-center gap-3">
+                <div className="w-9 h-9 rounded-xl bg-slate-800 flex items-center justify-center relative">
+                  <Bot className="w-5 h-5 text-emerald-400" />
+                  <span className="absolute bottom-0 right-0 w-2 h-2 bg-emerald-500 rounded-full border border-slate-900"></span>
                 </div>
-                <span className="absolute bottom-0 right-0 w-2 h-2 bg-emerald-400 border border-slate-900 rounded-full"></span>
+                <div>
+                  <div className="flex items-center gap-1.5">
+                    <h3 className="text-sm font-bold text-white">GenZ Study AI Bot</h3>
+                    <span className="text-[9px] bg-emerald-500/20 text-emerald-300 border border-emerald-500/30 px-1.5 py-0.2 rounded font-semibold">
+                      Gemini
+                    </span>
+                  </div>
+                  <p className="text-[11px] text-slate-400">Trợ lý cố vấn học tập chuẩn Gen Z</p>
+                </div>
               </div>
-              <div>
-                <div className="flex items-center gap-1.5">
-                  <h4 className="text-xs font-bold text-white">EduMind AI Gen Z</h4>
-                  <span className="bg-white/10 text-slate-300 text-[9px] px-1.5 py-0.2 rounded font-mono">
-                    Gemini 3.7 Flash
-                  </span>
-                </div>
-                <p className="text-[10px] text-slate-400">Trợ lý đồng hành học tập 24/7</p>
+
+              <button
+                onClick={onClose}
+                className="w-8 h-8 rounded-lg bg-slate-800 hover:bg-slate-700 text-slate-300 flex items-center justify-center transition-colors cursor-pointer"
+              >
+                <X className="w-4 h-4" />
+              </button>
+            </div>
+
+            {/* Quick Context Chips */}
+            <div className="bg-slate-50 px-4 py-2 border-b border-slate-200 flex items-center justify-between text-[11px] text-slate-600">
+              <div className="flex items-center gap-1">
+                <GraduationCap className="w-3.5 h-3.5 text-slate-500" />
+                <span>GPA: {gpa.toFixed(2)}</span>
+              </div>
+              <div className="flex items-center gap-1">
+                <Flame className="w-3.5 h-3.5 text-amber-500 fill-amber-500" />
+                <span>Streak: {streak} ngày</span>
+              </div>
+              <div className="flex items-center gap-1 text-slate-700 font-medium">
+                <Sparkles className="w-3 h-3 text-emerald-600" />
+                <span>ĐRL: {drl}/100</span>
               </div>
             </div>
 
-            <button
-              onClick={onClose}
-              className="w-7 h-7 rounded-lg bg-white/10 hover:bg-white/20 text-white flex items-center justify-center text-xs font-bold transition-colors cursor-pointer"
-            >
-              <X className="w-4 h-4" />
-            </button>
-          </div>
-
-          {/* Messages Area */}
-          <div className="flex-1 p-4 overflow-y-auto space-y-3 bg-slate-50/50 text-xs">
-            {messages.map((m, idx) => (
-              <div
-                key={idx}
-                className={`flex flex-col ${m.sender === "user" ? "items-end" : "items-start"}`}
-              >
+            {/* Messages Body */}
+            <div className="flex-1 p-4 overflow-y-auto space-y-3 bg-[#F8FAFC]">
+              {messages.map((m, idx) => (
                 <div
-                  className={`max-w-[85%] p-3 rounded-xl leading-relaxed ${
-                    m.sender === "user"
-                      ? "bg-slate-900 text-white rounded-br-xs font-medium"
-                      : "bg-white text-slate-800 border border-slate-200 shadow-2xs rounded-bl-xs"
+                  key={idx}
+                  className={`flex flex-col ${
+                    m.sender === "user" ? "items-end" : "items-start"
                   }`}
                 >
-                  {m.text}
+                  <div
+                    className={`max-w-[85%] rounded-2xl p-3 text-xs leading-relaxed shadow-2xs ${
+                      m.sender === "user"
+                        ? "bg-slate-900 text-white rounded-br-xs"
+                        : "bg-white border border-slate-200 text-slate-800 rounded-bl-xs"
+                    }`}
+                  >
+                    {m.text}
+                  </div>
+                  <span className="text-[9px] text-slate-400 mt-1 px-1">{m.time}</span>
                 </div>
-                <span className="text-[9px] text-slate-400 mt-1 px-1">{m.time}</span>
+              ))}
+
+              {loading && (
+                <div className="flex items-center gap-2 text-slate-400 text-xs bg-white border border-slate-200 rounded-xl p-3 max-w-[70%]">
+                  <Loader2 className="w-3.5 h-3.5 animate-spin text-slate-700" />
+                  <span>AI đang soạn tin nhắn...</span>
+                </div>
+              )}
+            </div>
+
+            {/* Input Bar */}
+            <div className="p-3 bg-white border-t border-slate-200">
+              {/* Quick suggestions */}
+              <div className="flex items-center gap-1.5 overflow-x-auto pb-2 mb-1 no-scrollbar">
+                {[
+                  "Kéo điểm GPA môn Giải tích 1",
+                  "Gợi ý môn tự chọn dễ thở",
+                  "Cách lấy trọn 100 điểm ĐRL",
+                ].map((sug, i) => (
+                  <button
+                    key={i}
+                    onClick={() => setInputMessage(sug)}
+                    className="text-[10px] bg-slate-100 hover:bg-slate-200 text-slate-700 font-medium px-2.5 py-1 rounded-full whitespace-nowrap transition-colors cursor-pointer"
+                  >
+                    {sug}
+                  </button>
+                ))}
               </div>
-            ))}
 
-            {loading && (
-              <div className="flex items-center gap-2 text-slate-500 text-xs bg-white p-2.5 rounded-lg border border-slate-200 w-fit">
-                <Loader2 className="w-3.5 h-3.5 animate-spin text-slate-900" />
-                <span>AI Gen Z đang suy nghĩ...</span>
+              <div className="flex items-center gap-2">
+                <input
+                  type="text"
+                  value={inputMessage}
+                  onChange={(e) => setInputMessage(e.target.value)}
+                  onKeyDown={(e) => e.key === "Enter" && handleSendMessage()}
+                  placeholder="Hỏi AI bất kỳ điều gì về lịch học, deadline..."
+                  className="flex-1 bg-slate-50 border border-slate-300 text-slate-900 text-xs rounded-xl px-3.5 py-2.5 focus:bg-white focus:outline-none focus:ring-1 focus:ring-slate-900"
+                />
+                <button
+                  onClick={handleSendMessage}
+                  disabled={loading || !inputMessage.trim()}
+                  className="w-9 h-9 rounded-xl bg-slate-900 hover:bg-slate-800 disabled:bg-slate-200 text-white flex items-center justify-center transition-colors cursor-pointer shrink-0 shadow-2xs"
+                >
+                  <Send className="w-4 h-4" />
+                </button>
               </div>
-            )}
-          </div>
-
-          {/* Prompt Chips */}
-          <div className="px-3 py-2 bg-slate-100/60 border-t border-slate-200 flex items-center gap-1.5 overflow-x-auto no-scrollbar">
-            {sampleChips.map((chip, i) => (
-              <button
-                key={i}
-                onClick={() => setInputMessage(chip)}
-                className="text-[10px] bg-white border border-slate-200 hover:bg-slate-50 text-slate-700 px-2.5 py-1 rounded-md shrink-0 transition-colors cursor-pointer"
-              >
-                {chip}
-              </button>
-            ))}
-          </div>
-
-          {/* Chat Input */}
-          <div className="p-3 bg-white border-t border-slate-200 flex items-center gap-2">
-            <input
-              type="text"
-              value={inputMessage}
-              onChange={(e) => setInputMessage(e.target.value)}
-              onKeyDown={(e) => e.key === "Enter" && handleSendMessage()}
-              placeholder="Nhắn tin cho AI Gen Z..."
-              className="flex-1 bg-white border border-slate-300 rounded-lg px-3 py-2 text-xs text-slate-900 focus:outline-none focus:ring-1 focus:ring-slate-900"
-            />
-            <button
-              onClick={handleSendMessage}
-              disabled={!inputMessage.trim() || loading}
-              className="w-8 h-8 bg-slate-900 hover:bg-slate-800 disabled:opacity-50 text-white rounded-lg flex items-center justify-center transition-colors shrink-0 cursor-pointer"
-            >
-              <Send className="w-3.5 h-3.5" />
-            </button>
+            </div>
           </div>
         </div>
       )}

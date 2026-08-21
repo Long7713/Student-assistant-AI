@@ -9,10 +9,12 @@ import {
   Info,
   DollarSign
 } from "lucide-react";
+import { useApp } from "../context/AppContext";
 
 export const ScholarshipAndGPAView: React.FC = () => {
+  const { userProfile, updateUserProfile } = useApp();
   const [targetGpa, setTargetGpa] = useState<number>(3.80);
-  const currentGpa = 3.68;
+  const currentGpa = userProfile.gpa;
 
   const coursesGpa = [
     { code: "MTH101", name: "Giải tích 1", credits: 4, midTerm: 8.5, finalNeeded: 8.8, currentScore: "A-" },
@@ -27,16 +29,16 @@ export const ScholarshipAndGPAView: React.FC = () => {
       reward: "10.000.000 VNĐ / Kỳ",
       gpaReq: "≥ 3.60",
       drlReq: "≥ 90/100",
-      status: "Đủ điều kiện GPA (Cần thêm +2 ĐRL)",
-      eligible: true,
+      status: `Đủ điều kiện GPA (${currentGpa.toFixed(2)} ≥ 3.60). Cần thêm +${Math.max(0, 90 - userProfile.drl)} ĐRL`,
+      eligible: currentGpa >= 3.60,
     },
     {
       name: "Học bổng Tài năng Trẻ Google & Doanh nghiệp Công nghệ",
       reward: "25.000.000 VNĐ + Suất Thực tập",
       gpaReq: "≥ 3.75",
       drlReq: "≥ 85/100",
-      status: "Cần nâng GPA từ 3.68 -> 3.75",
-      eligible: false,
+      status: currentGpa >= 3.75 ? "Đủ điều kiện toàn diện" : `Cần nâng GPA từ ${currentGpa.toFixed(2)} -> 3.75`,
+      eligible: currentGpa >= 3.75,
     }
   ];
 
@@ -58,74 +60,117 @@ export const ScholarshipAndGPAView: React.FC = () => {
           </p>
         </div>
 
-        <div className="flex items-center gap-3 bg-slate-50 border border-slate-200 px-4 py-2 rounded-xl">
-          <Target className="w-4 h-4 text-emerald-600" />
-          <div className="text-xs font-semibold text-slate-700">
-            Cần tăng thêm: <strong className="text-slate-900 font-bold">+0.12 GPA</strong>
+        <div className="flex items-center gap-3">
+          <div className="text-right">
+            <span className="text-[10px] text-slate-400 font-semibold uppercase">GPA Hiện tại</span>
+            <div className="text-lg font-bold text-slate-900">{currentGpa.toFixed(2)} / 4.0</div>
+          </div>
+          <div className="w-10 h-10 rounded-xl bg-slate-900 text-white flex items-center justify-center shadow-2xs">
+            <GraduationCap className="w-5 h-5 text-emerald-400" />
           </div>
         </div>
       </div>
 
-      {/* Target Simulator & Scholarships */}
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-        {/* GPA Simulator */}
-        <div className="bg-white rounded-xl p-5 border border-slate-200 shadow-2xs space-y-4">
-          <div className="flex items-center justify-between">
-            <h3 className="text-xs font-bold text-slate-900 uppercase tracking-wider flex items-center gap-1.5">
-              <Calculator className="w-4 h-4 text-slate-700" />
-              <span>Dự Toán Điểm Cuối Kỳ Tối Thiểu</span>
+      {/* Target Adjuster Slider */}
+      <div className="bg-white rounded-xl p-5 border border-slate-200 shadow-2xs space-y-3">
+        <div className="flex items-center justify-between">
+          <div className="flex items-center gap-2">
+            <Target className="w-4 h-4 text-slate-700" />
+            <h3 className="text-xs font-bold text-slate-900 uppercase tracking-wider">
+              Tùy Chỉnh Mục Tiêu GPA Học Kỳ Này
             </h3>
-            <span className="text-xs text-slate-400">Trọng số 30% GK - 70% CK</span>
           </div>
-
-          <div className="space-y-3">
-            {coursesGpa.map((c, idx) => (
-              <div key={idx} className="bg-slate-50/50 p-3.5 rounded-xl border border-slate-200 flex items-center justify-between gap-3">
-                <div>
-                  <h4 className="text-xs font-bold text-slate-900">{c.name} ({c.credits} TC)</h4>
-                  <p className="text-[11px] text-slate-500 mt-0.5">Giữa kỳ: {c.midTerm} • Dự kiến: {c.currentScore}</p>
-                </div>
-                <div className="text-right">
-                  <div className="text-[10px] text-slate-400">Cần thi cuối kỳ</div>
-                  <div className="text-sm font-bold text-slate-900">≥ {c.finalNeeded} đ</div>
-                </div>
-              </div>
-            ))}
-          </div>
+          <span className="text-xs font-bold text-slate-900 bg-slate-100 px-3 py-1 rounded-lg border border-slate-200">
+            {targetGpa.toFixed(2)} / 4.0
+          </span>
         </div>
 
-        {/* Available Scholarships */}
-        <div className="bg-white rounded-xl p-5 border border-slate-200 shadow-2xs space-y-4">
-          <div className="flex items-center justify-between">
-            <h3 className="text-xs font-bold text-slate-900 uppercase tracking-wider flex items-center gap-1.5">
-              <Award className="w-4 h-4 text-slate-700" />
-              <span>Danh Sách Học Bổng Đang Mở Đơn</span>
-            </h3>
-            <span className="text-xs text-slate-600 font-medium">2 Học bổng phù hợp</span>
-          </div>
+        <input 
+          type="range" 
+          min="3.20" 
+          max="4.00" 
+          step="0.05"
+          value={targetGpa}
+          onChange={(e) => setTargetGpa(parseFloat(e.target.value))}
+          className="w-full h-2 bg-slate-200 rounded-lg appearance-none cursor-pointer accent-slate-900"
+        />
 
-          <div className="space-y-3">
-            {scholarships.map((s, idx) => (
-              <div key={idx} className="bg-slate-50/50 p-4 rounded-xl border border-slate-200 space-y-2">
-                <div className="flex items-start justify-between gap-2">
-                  <h4 className="text-xs font-bold text-slate-900">{s.name}</h4>
-                  <span className="text-xs font-bold text-emerald-800 bg-emerald-50 border border-emerald-200 px-2 py-0.5 rounded-md shrink-0">
-                    {s.reward}
-                  </span>
+        <div className="flex justify-between text-[11px] text-slate-400 font-medium">
+          <span>3.20 (Khá)</span>
+          <span>3.60 (Giỏi - Học bổng KKHT)</span>
+          <span>3.80 (Xuất sắc)</span>
+          <span>4.00 (Thủ khoa)</span>
+        </div>
+      </div>
+
+      {/* Course Grade Breakdown Matrix */}
+      <div className="bg-white rounded-xl p-5 border border-slate-200 shadow-2xs space-y-4">
+        <div className="flex items-center justify-between">
+          <h3 className="text-xs font-bold text-slate-900 uppercase tracking-wider flex items-center gap-2">
+            <Calculator className="w-4 h-4 text-slate-600" />
+            <span>Kịch Bản Điểm Thi Cuối Kỳ Tối Thiểu Cần Đạt</span>
+          </h3>
+          <span className="text-xs text-slate-500 font-medium">Trọng số: Giữa kỳ 40% + Cuối kỳ 60%</span>
+        </div>
+
+        <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 gap-4">
+          {coursesGpa.map((c) => (
+            <div key={c.code} className="bg-slate-50/50 p-4 rounded-xl border border-slate-200 space-y-2">
+              <div className="flex items-center justify-between">
+                <span className="text-xs font-bold text-slate-900">{c.code}</span>
+                <span className="text-[10px] bg-slate-200 text-slate-700 px-1.5 py-0.5 rounded font-bold">
+                  {c.credits} TC
+                </span>
+              </div>
+              <p className="text-xs text-slate-600 line-clamp-1">{c.name}</p>
+
+              <div className="pt-2 border-t border-slate-200/70 space-y-1 text-xs">
+                <div className="flex justify-between text-slate-500">
+                  <span>Điểm GK đã có:</span>
+                  <span className="font-semibold text-slate-800">{c.midTerm}</span>
                 </div>
-                <div className="flex items-center gap-3 text-[11px] text-slate-600">
-                  <span>Yêu cầu GPA: <strong>{s.gpaReq}</strong></span>
-                  <span>•</span>
-                  <span>ĐRL: <strong>{s.drlReq}</strong></span>
-                </div>
-                <div className={`text-[11px] font-semibold px-2 py-1 rounded-md ${
-                  s.eligible ? "bg-emerald-50 text-emerald-800 border border-emerald-200" : "bg-slate-100 text-slate-700 border border-slate-200"
-                }`}>
-                  {s.status}
+                <div className="flex justify-between text-emerald-800 font-bold bg-emerald-50/80 px-2 py-1 rounded">
+                  <span>Cần thi CK:</span>
+                  <span>≥ {c.finalNeeded}</span>
                 </div>
               </div>
-            ))}
-          </div>
+            </div>
+          ))}
+        </div>
+      </div>
+
+      {/* Scholarships Matched */}
+      <div className="bg-white rounded-xl p-5 border border-slate-200 shadow-2xs space-y-4">
+        <div className="flex items-center justify-between">
+          <h3 className="text-xs font-bold text-slate-900 uppercase tracking-wider flex items-center gap-2">
+            <Award className="w-4 h-4 text-slate-600" />
+            <span>Danh Sách Học Bổng Đang Mở Đơn & Độ Tương Thích</span>
+          </h3>
+        </div>
+
+        <div className="space-y-3">
+          {scholarships.map((s, idx) => (
+            <div key={idx} className="p-4 rounded-xl border border-slate-200 bg-slate-50/50 flex flex-col md:flex-row items-start md:items-center justify-between gap-3">
+              <div>
+                <h4 className="text-sm font-bold text-slate-900">{s.name}</h4>
+                <div className="flex items-center gap-3 text-xs text-slate-500 mt-1">
+                  <span>Yêu cầu: GPA {s.gpaReq}</span>
+                  <span>•</span>
+                  <span>ĐRL {s.drlReq}</span>
+                  <span>•</span>
+                  <span className="text-emerald-700 font-semibold">{s.reward}</span>
+                </div>
+                <p className="text-xs text-slate-600 mt-1.5">{s.status}</p>
+              </div>
+
+              <button 
+                onClick={() => alert(`Đã lưu học bổng "${s.name}" vào danh sách theo dõi!`)}
+                className="bg-slate-900 hover:bg-slate-800 text-white font-semibold text-xs px-4 py-2 rounded-lg transition-all shadow-2xs whitespace-nowrap cursor-pointer"
+              >
+                Nộp Hồ Sơ
+              </button>
+            </div>
+          ))}
         </div>
       </div>
     </div>
