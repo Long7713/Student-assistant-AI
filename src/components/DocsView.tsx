@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import { useState, useEffect } from "react";
 import { 
   BookOpen, 
   Search, 
@@ -23,10 +23,14 @@ interface DocsViewProps {
   onAddDoc: (doc: SmartDoc) => void;
 }
 
-export const DocsView: React.FC<DocsViewProps> = ({ docs, onAddDoc }) => {
+export const DocsView = ({ docs, onAddDoc }: DocsViewProps) => {
   const [searchQuery, setSearchQuery] = useState<string>("");
   const [selectedCategory, setSelectedCategory] = useState<string>("Tất cả");
   const [uploadModalOpen, setUploadModalOpen] = useState<boolean>(false);
+
+  // Semantic Search states
+  const [isSearching, setIsSearching] = useState<boolean>(false);
+  const [semanticResults, setSemanticResults] = useState<SmartDoc[] | null>(null);
   
   // Upload simulation states
   const [uploadingFile, setUploadingFile] = useState<boolean>(false);
@@ -42,16 +46,56 @@ export const DocsView: React.FC<DocsViewProps> = ({ docs, onAddDoc }) => {
 
   const categories = ["Tất cả", "Đề thi & Lời giải", "Giáo trình", "Slide bài giảng", "Tóm tắt ôn tập"];
 
+  // Semantic Search Effect
+  useEffect(() => {
+    if (!searchQuery.trim()) {
+      setSemanticResults(null);
+      setIsSearching(false);
+      return;
+    }
+
+    const timer = setTimeout(async () => {
+      setIsSearching(true);
+      try {
+        const response = await fetch("/api/gemini/semantic-search", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ query: searchQuery, docs }),
+        });
+        const data = await response.json();
+        if (data.success) {
+          setSemanticResults(data.results);
+        }
+      } catch (err) {
+        console.error("Semantic search failed:", err);
+      } finally {
+        setIsSearching(false);
+      }
+    }, 600); // 600ms debounce
+
+    return () => clearTimeout(timer);
+  }, [searchQuery, docs]);
+
   // Filter docs by search and category
-  const filteredDocs = docs.filter((doc) => {
-    const matchesCategory = selectedCategory === "Tất cả" || doc.category === selectedCategory;
-    const matchesSearch =
-      doc.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      doc.subject.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      doc.tags.some((t) => t.toLowerCase().includes(searchQuery.toLowerCase())) ||
-      doc.summary.toLowerCase().includes(searchQuery.toLowerCase());
-    return matchesCategory && matchesSearch;
-  });
+  const getFilteredDocs = () => {
+    const baseDocs = semanticResults && searchQuery.trim() ? semanticResults : docs;
+    
+    return baseDocs.filter((doc) => {
+      const matchesCategory = selectedCategory === "Tất cả" || doc.category === selectedCategory;
+      
+      // If we have semantic results, we don't need keyword matching anymore
+      if (semanticResults && searchQuery.trim()) return matchesCategory;
+
+      const matchesSearch =
+        doc.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
+        doc.subject.toLowerCase().includes(searchQuery.toLowerCase()) ||
+        doc.tags.some((t) => t.toLowerCase().includes(searchQuery.toLowerCase())) ||
+        doc.summary.toLowerCase().includes(searchQuery.toLowerCase());
+      return matchesCategory && matchesSearch;
+    });
+  };
+
+  const filteredDocs = getFilteredDocs();
 
   const handleSimulateSmartUpload = async () => {
     setAnalyzingWithGemini(true);
@@ -182,16 +226,19 @@ export const DocsView: React.FC<DocsViewProps> = ({ docs, onAddDoc }) => {
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
             placeholder="Tìm kiếm ngữ nghĩa (ví dụ: 'Tìm tài liệu nói về thuật toán Dijkstra môn Cấu trúc dữ liệu')..."
-            className="w-full bg-white border border-slate-300 rounded-lg pl-10 pr-4 py-2 text-xs text-slate-900 focus:outline-none focus:ring-1 focus:ring-slate-900"
+            className="w-full bg-white border border-slate-300 rounded-lg pl-10 pr-12 py-2 text-xs text-slate-900 focus:outline-none focus:ring-1 focus:ring-slate-900"
           />
-          {searchQuery && (
-            <button
-              onClick={() => setSearchQuery("")}
-              className="text-xs text-slate-400 hover:text-slate-600 absolute right-3 top-1/2 -translate-y-1/2"
-            >
-              ✕
-            </button>
-          )}
+          <div className="absolute right-3 top-1/2 -translate-y-1/2 flex items-center gap-2">
+            {isSearching && <Loader2 className="w-3.5 h-3.5 animate-spin text-slate-400" />}
+            {searchQuery && (
+              <button
+                onClick={() => setSearchQuery("")}
+                className="text-xs text-slate-400 hover:text-slate-600"
+              >
+                ✕
+              </button>
+            )}
+          </div>
         </div>
 
         {/* Category filters */}

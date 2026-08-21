@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import { useState } from "react";
 import { 
   Trophy, 
   Flame, 
@@ -19,7 +19,7 @@ interface LeaderboardViewProps {
   currentUserXp: number;
 }
 
-export const LeaderboardView: React.FC<LeaderboardViewProps> = ({ users, currentUserXp }) => {
+export const LeaderboardView = ({ users, currentUserXp }: LeaderboardViewProps) => {
   const [filterPeriod, setFilterPeriod] = useState<"week" | "month" | "all">("week");
   const [activeTabSub, setActiveTabSub] = useState<"ranking" | "rewards">("ranking");
 

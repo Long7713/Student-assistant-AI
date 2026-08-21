@@ -1,8 +1,7 @@
-import React from "react";
 import { Users, Sparkles, CheckCircle2, Calendar, MapPin, CalendarPlus } from "lucide-react";
 import { INITIAL_DRL_EVENTS } from "../mockData";
 
-export const DRLView: React.FC = () => {
+export const DRLView = () => {
   return (
     <div className="space-y-6">
       {/* Top Banner */}

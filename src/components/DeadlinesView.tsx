@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import { useState } from "react";
 import { 
   AlertCircle, 
   Clock, 
@@ -24,12 +24,12 @@ interface DeadlinesViewProps {
   onAddNewDeadline: (task: Partial<DeadlineTask>) => void;
 }
 
-export const DeadlinesView: React.FC<DeadlinesViewProps> = ({
+export const DeadlinesView = ({
   deadlines,
   onToggleSubtask,
   onCompleteDeadline,
   onAddNewDeadline,
-}) => {
+}: DeadlinesViewProps) => {
   const [showAddModal, setShowAddModal] = useState<boolean>(false);
   const [newTitle, setNewTitle] = useState<string>("");
   const [newCourse, setNewCourse] = useState<string>("CSE102");

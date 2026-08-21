@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import { useState } from "react";
 import { 
   Calendar, 
   GraduationCap, 
@@ -23,7 +23,7 @@ interface HeaderProps {
   xp?: number;
 }
 
-export const Header: React.FC<HeaderProps> = ({
+export const Header = ({
   activeTab,
   setActiveTab,
   gpa,
@@ -31,7 +31,7 @@ export const Header: React.FC<HeaderProps> = ({
   rank,
   streak,
   xp = 2450,
-}) => {
+}: HeaderProps) => {
   const [isProfileOpen, setIsProfileOpen] = useState(false);
 
   const tabs = [

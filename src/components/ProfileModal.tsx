@@ -1,4 +1,3 @@
-import React from "react";
 import { 
   X, 
   User, 
@@ -27,7 +26,7 @@ interface ProfileModalProps {
   onNavigateTab?: (tab: string) => void;
 }
 
-export const ProfileModal: React.FC<ProfileModalProps> = ({
+export const ProfileModal = ({
   isOpen,
   onClose,
   gpa,
@@ -36,7 +35,7 @@ export const ProfileModal: React.FC<ProfileModalProps> = ({
   streak,
   xp,
   onNavigateTab,
-}) => {
+}: ProfileModalProps) => {
   if (!isOpen) return null;
 
   return (

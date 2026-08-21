@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import { useState } from "react";
 import { 
   Sparkles, 
   AlertTriangle, 
@@ -21,12 +21,12 @@ interface ScheduleOptimizerModalProps {
   currentCourses: Course[];
 }
 
-export const ScheduleOptimizerModal: React.FC<ScheduleOptimizerModalProps> = ({
+export const ScheduleOptimizerModal = ({
   isOpen,
   onClose,
   onApplyPlan,
   currentCourses,
-}) => {
+}: ScheduleOptimizerModalProps) => {
   const [prompt, setPrompt] = useState<string>(
     "Tôi muốn đăng ký thêm môn Mạng máy tính (IT005) Thứ 4 tiết 6-8 hoặc Chiều Thứ 5, và môn Trí tuệ nhân tạo (IT008) sáng Thứ 2 tiết 1-3. Hãy kiểm tra xem có bị trùng lịch với Cấu trúc Dữ liệu hoặc Triết học không và gợi ý lịch tối ưu nhất nhé!"
   );

@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import { useState } from "react";
 import { 
   Sparkles, 
   Send, 
@@ -20,14 +20,14 @@ interface GenZChatDrawerProps {
   streak: number;
 }
 
-export const GenZChatDrawer: React.FC<GenZChatDrawerProps> = ({
+export const GenZChatDrawer = ({
   isOpen,
   onClose,
   onOpen,
   gpa,
   drl,
   streak,
-}) => {
+}: GenZChatDrawerProps) => {
   const [messages, setMessages] = useState<Array<{ sender: "ai" | "user"; text: string; time: string }>>([
     {
       sender: "ai",

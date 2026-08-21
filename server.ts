@@ -129,12 +129,46 @@ Trả về định dạng JSON hợp lệ theo đúng cấu trúc:
   }
 });
 
+// --- Vector Search & AI De-duplication Logic ---
+
+// Helper: Simple Cosine Similarity
+function cosineSimilarity(vecA: number[], vecB: number[]) {
+  const dotProduct = vecA.reduce((sum, a, i) => sum + a * vecB[i], 0);
+  const normA = Math.sqrt(vecA.reduce((sum, a) => sum + a * a, 0));
+  const normB = Math.sqrt(vecB.reduce((sum, b) => sum + b * b, 0));
+  return dotProduct / (normA * normB);
+}
+
+// In-memory Vector Store (Simulating pgvector on Supabase)
+// Stores: docId -> embedding vector
+const vectorStore: Record<string, number[]> = {};
+
+// Helper: Get Embedding using Gemini
+async function getEmbedding(text: string) {
+  const ai = getGeminiClient();
+  if (!ai) return null;
+  try {
+    const result = await ai.models.embedContent({
+      model: "text-embedding-004",
+      contents: text
+    });
+    const embedRes = result as any;
+    return embedRes.embedding?.values || embedRes.embeddings?.[0]?.values || null;
+  } catch (err) {
+    console.error("Embedding error:", err);
+    return null;
+  }
+}
+
 // 2. Endpoint: AI Smart Document Analysis & Duplicate Detection
 app.post("/api/gemini/doc-analyze", async (req, res) => {
   const { title, excerpt, existingDocs } = req.body;
   const ai = getGeminiClient();
 
   if (!ai) {
+    // Check for "duplicate" in simulation mode if existingDocs is provided
+    const isMockDuplicate = title.toLowerCase().includes("de_thi") && existingDocs?.length > 0;
+    
     return res.json({
       success: true,
       metadata: {
@@ -195,10 +229,80 @@ Trả về JSON cấu trúc:
     });
 
     const parsed = JSON.parse(response.text || "{}");
+
+    // Day 1 Task: Vector Similarity & Duplicate Detection
+    // 1. Generate embedding for the new document
+    const contentToEmbed = `${title} ${excerpt} ${parsed.metadata?.summary || ""}`;
+    const newEmbedding = await getEmbedding(contentToEmbed);
+
+    if (newEmbedding) {
+      let highestSimilarity = 0;
+      let mostSimilarDoc = null;
+
+      // 2. Compare with existing docs in vectorStore
+      // Note: In real app, we query pgvector. Here we simulate it.
+      for (const [id, vec] of Object.entries(vectorStore)) {
+        const similarity = cosineSimilarity(newEmbedding, vec);
+        if (similarity > highestSimilarity) {
+          highestSimilarity = similarity;
+          mostSimilarDoc = existingDocs.find((d: any) => d.id === id);
+        }
+      }
+
+      // 3. Update duplicate check if similarity > 0.90
+      if (highestSimilarity > 0.90 && mostSimilarDoc) {
+        parsed.duplicateCheck = {
+          isDuplicate: true,
+          similarityScore: Math.round(highestSimilarity * 100),
+          duplicateWith: {
+            id: mostSimilarDoc.id,
+            title: mostSimilarDoc.title,
+            matchReason: `Trùng khớp ngữ nghĩa ${Math.round(highestSimilarity * 100)}% (Vector Similarity Search).`
+          }
+        };
+      }
+
+      // Store the new embedding (simulation of persistence)
+      // Use a temporary ID or wait for client to confirm save. 
+      // For demo, we store it if not duplicate or even if duplicate to keep history.
+      const tempId = `temp-${Date.now()}`;
+      vectorStore[tempId] = newEmbedding;
+    }
+
     res.json({ success: true, ...parsed });
   } catch (error: any) {
     console.error("Gemini doc analyze error:", error);
     res.status(500).json({ success: false, error: error.message });
+  }
+});
+
+// 2b. Endpoint: Semantic Search (Day 1 Task)
+app.post("/api/gemini/semantic-search", async (req, res) => {
+  const { query, docs } = req.body;
+  const queryEmbedding = await getEmbedding(query);
+
+  if (!queryEmbedding || !docs || docs.length === 0) {
+    return res.json({ success: true, results: docs });
+  }
+
+  try {
+    const scoredDocs = await Promise.all(docs.map(async (doc: any) => {
+      const docText = `${doc.title} ${doc.summary} ${doc.subject} ${doc.tags.join(" ")}`;
+      const docEmbedding = await getEmbedding(docText);
+      if (!docEmbedding) {
+        return { ...doc, score: 0.5 };
+      }
+      const score = cosineSimilarity(queryEmbedding, docEmbedding);
+      return { ...doc, score };
+    }));
+
+    // Sort by score descending
+    scoredDocs.sort((a: any, b: any) => b.score - a.score);
+
+    res.json({ success: true, results: scoredDocs });
+  } catch (error) {
+    console.error("Semantic search error:", error);
+    res.json({ success: false, results: docs });
   }
 });
 

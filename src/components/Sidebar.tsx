@@ -1,4 +1,3 @@
-import React from "react";
 import { 
   Calendar, 
   GraduationCap, 
@@ -17,12 +16,12 @@ interface SidebarProps {
   streak: number;
 }
 
-export const Sidebar: React.FC<SidebarProps> = ({
+export const Sidebar = ({
   activeTab,
   setActiveTab,
   openAiChat,
   streak
-}) => {
+}: SidebarProps) => {
   const navItems = [
     { id: "schedule", label: "TKB", icon: Calendar },
     { id: "deadlines", label: "TASK", icon: CheckSquare },

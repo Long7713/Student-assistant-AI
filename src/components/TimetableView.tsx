@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import { useState } from "react";
 import { 
   Sparkles, 
   Calendar as CalendarIcon, 
@@ -27,7 +27,7 @@ interface TimetableViewProps {
   onUpdateCourseClass: (courseCode: string, newClassCode: string) => void;
 }
 
-export const TimetableView: React.FC<TimetableViewProps> = ({
+export const TimetableView = ({
   courses,
   plans,
   activePlanId,
@@ -35,7 +35,7 @@ export const TimetableView: React.FC<TimetableViewProps> = ({
   onOpenAiOptimizer,
   onAddCourse,
   onUpdateCourseClass,
-}) => {
+}: TimetableViewProps) => {
   const [isCalendarSynced, setIsCalendarSynced] = useState<boolean>(true);
   const [syncing, setSyncing] = useState<boolean>(false);
   const [syncSuccessToast, setSyncSuccessToast] = useState<string | null>(null);

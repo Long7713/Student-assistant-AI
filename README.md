@@ -43,7 +43,9 @@ graph TD
 ---
 
 ## 📅 Lịch Triển Khai Chi Tiết
+# 🚀 Kế Hoạch Triển Khai Cấp Tốc
 
+<<<<<<< HEAD
 >>Báo trong mess mình làm phần nào, sau đó làm phần nào commit vào rồi đánh dấu "+" vào
 
 
@@ -63,6 +65,368 @@ graph TD
 | **Day 12**<br>*(25/08/2026)* | **Tối ưu hóa Chi phí GCP & Performance** | - Cấu hình Caching cho Gemini API requests.<br>- Tối ưu hóa Security Rules cho Firestore & Cloud Storage.<br>- Giảm dung lượng file build. | - Báo cáo performance & ngân sách API khả thi. |
 | **Day 13**<br>*(26/08/2026)* | **Quay Video Demo & Làm Slide Pitch** | - Quay Video Demo 3 phút thể hiện nổi bật 5 chức năng cốt lõi và hệ sinh thái Google.<br>- Soạn thảo Slide thuyết trình tập trung vào bài toán sinh viên & giá trị AI. | - Video Demo HD có phụ đề.<br>- Slide Pitch Deck chuyên nghiệp. |
 | **Day 14**<br>*(27/08 - 29/08)* | **Rà soát & Nộp Bài Cuộc Thi** | - Kiểm tra toàn bộ link Github, tài liệu README, Video Demo.<br>- Dự phòng khắc phục sự cố hệ thống submission (nếu có).<br>- Nộp bài lên Portal cuộc thi Google AI / Hackathon. | - **Hoàn tất thủ tục nộp bài chính thức trước ngày 30/08/2026.** |
+=======
+> **Sprint Duration:** 9 ngày
+> **Thời gian:** 21/08/2026 → 29/08/2026
+> **Mục tiêu:** Hoàn thiện sản phẩm, kiểm thử end-to-end, chuẩn bị Pitch Deck, Video Demo và nộp bài chính thức.
+
+---
+
+## 📅 Sprint Timeline
+
+| Day       | Ngày  | Hạng Mục                   | Mục Tiêu Chính                                |
+| --------- | ----- | -------------------------- | --------------------------------------------- |
+| **Day 1** | 21/08 | 🤖 AI & Vector Search      | Hoàn thiện Semantic Search và chống trùng lặp |
+| **Day 2** | 22/08 | 🎯 Deadline & Gamification | Priority Score, Focus Zone, XP và Leaderboard |
+| **Day 3** | 23/08 | 🎨 UI/UX Polish            | Material Design 3, Dark Mode, Responsive      |
+| **Day 4** | 24/08 | 🧪 Integration Testing     | Kiểm thử toàn bộ user flow                    |
+| **Day 5** | 25/08 | ⚡ Performance & Security   | Caching, tối ưu GCP và Supabase RLS           |
+| **Day 6** | 26/08 | 📊 Pitch Deck & Script     | Hoàn thiện slide và kịch bản demo             |
+| **Day 7** | 27/08 | 🎬 Video Demo              | Quay, dựng và hoàn thiện video                |
+| **Day 8** | 28/08 | 🧹 Repository Cleanup      | Clean code, README và Release                 |
+| **Day 9** | 29/08 | 🚀 Official Submission     | Nộp bài trước deadline                        |
+
+---
+
+# 🗓️ Chi Tiết Kế Hoạch Triển Khai
+
+## 🤖 Day 1 — AI Chống Trùng Lặp & Vector Search
+
+**📅 Ngày:** 21/08/2026
+
+### Mục tiêu
+
+Hoàn thiện khả năng tìm kiếm ngữ nghĩa và phát hiện nội dung trùng lặp bằng AI.
+
+### Công việc
+
+* + Tích hợp Embeddings API.(Long)
+* + Thiết kế pipeline tạo và lưu embeddings.(Long)
+* + Cấu hình `pgvector` trên Supabase.(Long)
+* + Viết logic Vector Similarity Search.(Long)
+* + Xây dựng cơ chế phát hiện nội dung/tài liệu trùng lặp.(Long)
+* + Hoàn thiện Semantic Search.(Long)
+* + Kiểm thử độ chính xác của kết quả tìm kiếm.(Long)
+
+### Deliverables
+
+* Semantic Search hoạt động.
+* Duplicate Detection hoạt động.
+* Vector embeddings được lưu trữ và truy vấn ổn định.
+
+---
+
+## 🎯 Day 2 — Deadline Động & Gamification
+
+**📅 Ngày:** 22/08/2026
+
+### Mục tiêu
+
+Xây dựng hệ thống ưu tiên công việc và tăng động lực học tập thông qua gamification.
+
+### Công việc
+
+* [ ] Thiết kế thuật toán `Priority Score`.
+* [ ] Tính toán độ khẩn cấp dựa trên deadline.
+* [ ] Kết hợp workload, mức độ quan trọng và thời gian còn lại.
+* [ ] Xây dựng UI **Focus Zone**.
+* [ ] Tích hợp hệ thống XP.
+* [ ] Xây dựng cơ chế tăng XP khi hoàn thành nhiệm vụ.
+* [ ] Xây dựng Leaderboard.
+* [ ] Kiểm thử logic gamification.
+
+### Deliverables
+
+* Dynamic Priority System.
+* Focus Zone UI.
+* XP System.
+* Leaderboard hoạt động.
+
+---
+
+## 🎨 Day 3 — UI/UX Polish & Material Design 3
+
+**📅 Ngày:** 23/08/2026
+
+### Mục tiêu
+
+Đưa giao diện về trạng thái hoàn thiện, nhất quán và sẵn sàng demo.
+
+### Công việc
+
+* [ ] Chuẩn hóa Design System theo Material Design 3.
+* [ ] Đồng bộ typography, spacing và component.
+* [ ] Hoàn thiện Dark Mode.
+* [ ] Thêm micro-interactions.
+* [ ] Thêm loading states và empty states.
+* [ ] Kiểm tra responsive trên Mobile.
+* [ ] Kiểm tra responsive trên Tablet.
+* [ ] Kiểm tra responsive trên Desktop.
+* [ ] Fix các lỗi UI/UX còn tồn đọng.
+
+### Deliverables
+
+* UI thống nhất.
+* Dark Mode hoàn chỉnh.
+* Responsive trên các kích thước màn hình chính.
+* Sẵn sàng quay Demo Video.
+
+---
+
+## 🧪 Day 4 — Integration & End-to-End Testing
+
+**📅 Ngày:** 24/08/2026
+
+### Mục tiêu
+
+Kiểm thử toàn bộ luồng sử dụng thực tế của người dùng.
+
+### Critical User Flow
+
+```text
+Đăng ký / Đăng nhập
+        ↓
+Đăng ký môn học
+        ↓
+Tạo Assignment / Deadline
+        ↓
+AI phân tích & xếp lịch
+        ↓
+Hiển thị Priority / Focus Zone
+        ↓
+Sync Calendar
+        ↓
+Upload tài liệu
+        ↓
+AI Search / Vector Search
+        ↓
+Hoàn thành nhiệm vụ & nhận XP
+```
+
+### Công việc
+
+* [ ] Test Authentication Flow.
+* [ ] Test Course Registration Flow.
+* [ ] Test AI Scheduling.
+* [ ] Test Dynamic Deadline.
+* [ ] Test Calendar Sync.
+* [ ] Test File Upload.
+* [ ] Test Vector Search.
+* [ ] Test Gamification.
+* [ ] Test Error Handling.
+* [ ] Fix các critical bugs.
+
+### Deliverables
+
+* Toàn bộ core user flow hoạt động end-to-end.
+* Không còn critical bugs.
+
+---
+
+## ⚡ Day 5 — Performance & Security Optimization
+
+**📅 Ngày:** 25/08/2026
+
+### Mục tiêu
+
+Tối ưu hiệu năng, chi phí AI API và bảo mật hệ thống.
+
+### Công việc
+
+* [ ] Cấu hình caching cho AI/Gemini API requests.
+* [ ] Tránh gửi lại các request AI không cần thiết.
+* [ ] Tối ưu database queries.
+* [ ] Kiểm tra index cho các bảng quan trọng.
+* [ ] Rà soát Supabase Row Level Security (RLS).
+* [ ] Kiểm tra quyền truy cập dữ liệu người dùng.
+* [ ] Kiểm tra API keys và environment variables.
+* [ ] Test performance trên các luồng chính.
+
+### Deliverables
+
+* API response nhanh hơn.
+* Giảm request AI dư thừa.
+* Supabase RLS được kiểm tra.
+* Không còn API key bị hardcode trong source code.
+
+---
+
+## 📊 Day 6 — Pitch Deck & Video Script
+
+**📅 Ngày:** 26/08/2026
+
+### Mục tiêu
+
+Chuẩn bị toàn bộ nội dung trình bày cho phần đánh giá.
+
+### Pitch Deck — 10 đến 12 Slides
+
+* [ ] Problem.
+* [ ] Target Users.
+* [ ] Current Pain Points.
+* [ ] Solution.
+* [ ] Product Overview.
+* [ ] Core Features.
+* [ ] AI Architecture.
+* [ ] Technical Stack.
+* [ ] User Journey.
+* [ ] Impact / Value Proposition.
+* [ ] Future Roadmap.
+* [ ] Closing / Call to Action.
+
+### Video Demo
+
+* [ ] Viết kịch bản Demo Video khoảng 3 phút.
+* [ ] Xác định từng màn hình cần quay.
+* [ ] Viết voiceover.
+* [ ] Chuẩn bị phụ đề Anh - Việt.
+* [ ] Chuẩn bị dữ liệu demo.
+
+### Deliverables
+
+* Pitch Deck hoàn chỉnh.
+* Video Script hoàn chỉnh.
+* Demo flow được xác định rõ.
+
+---
+
+## 🎬 Day 7 — Quay & Dựng Video Demo
+
+**📅 Ngày:** 27/08/2026
+
+### Mục tiêu
+
+Hoàn thiện Video Demo giới thiệu sản phẩm.
+
+### Công việc
+
+* [ ] Quay màn hình sản phẩm thực tế.
+* [ ] Quay toàn bộ demo flow.
+* [ ] Thu âm voiceover.
+* [ ] Dựng Video Demo.
+* [ ] Thêm phụ đề tiếng Anh.
+* [ ] Thêm phụ đề tiếng Việt nếu cần.
+* [ ] Thêm intro/outro.
+* [ ] Kiểm tra thời lượng khoảng 3 phút.
+* [ ] Export phiên bản final.
+
+### Suggested Demo Flow
+
+```text
+Problem
+   ↓
+Introduce Product
+   ↓
+Create Course / Assignment
+   ↓
+AI Scheduling
+   ↓
+Dynamic Priority
+   ↓
+Focus Zone
+   ↓
+Calendar Sync
+   ↓
+Upload Document
+   ↓
+AI Semantic Search
+   ↓
+Gamification
+   ↓
+Closing
+```
+
+### Deliverables
+
+* Video Demo hoàn chỉnh.
+* Thời lượng khoảng 3 phút.
+* Có voiceover và phụ đề.
+
+---
+
+## 🧹 Day 8 — Repository Cleanup & README
+
+**📅 Ngày:** 28/08/2026
+
+### Mục tiêu
+
+Chuẩn bị repository ở trạng thái sẵn sàng review.
+
+### Công việc
+
+* [ ] Clean code.
+* [ ] Xóa dead code.
+* [ ] Xóa debug logs không cần thiết.
+* [ ] Kiểm tra API keys.
+* [ ] Kiểm tra `.env`.
+* [ ] Cập nhật `.gitignore`.
+* [ ] Cập nhật README.
+* [ ] Thêm Architecture Overview.
+* [ ] Thêm Installation Guide.
+* [ ] Thêm Tech Stack.
+* [ ] Thêm Screenshots/GIF Demo.
+* [ ] Tạo Release cuối cùng.
+* [ ] Push code lên GitHub.
+
+### Final Repository Checklist
+
+* [ ] Project chạy được từ hướng dẫn README.
+* [ ] Không lộ API keys.
+* [ ] Code được tổ chức rõ ràng.
+* [ ] README đầy đủ.
+* [ ] Các tính năng chính được mô tả.
+* [ ] Demo assets được đính kèm nếu cần.
+
+---
+
+## 🚀 Day 9 — Official Submission
+
+**📅 Ngày:** 29/08/2026
+
+### Mục tiêu
+
+Nộp bài sớm để tránh các sự cố kỹ thuật vào phút cuối.
+
+### Submission Checklist
+
+* [ ] Kiểm tra GitHub Repository.
+* [ ] Kiểm tra README.
+* [ ] Kiểm tra bản Release.
+* [ ] Kiểm tra Demo Video.
+* [ ] Kiểm tra Pitch Deck.
+* [ ] Kiểm tra toàn bộ đường link.
+* [ ] Kiểm tra quyền truy cập repository.
+* [ ] Chuẩn bị mô tả dự án.
+* [ ] Submit bài chính thức.
+
+> ⚠️ **Khuyến nghị:** Không chờ đến phút cuối. Hoàn thành và submit bài trước **23:59 ngày 29/08/2026** để có thời gian xử lý các sự cố như nghẽn mạng, lỗi upload hoặc sai đường link.
+
+---
+
+# 🎯 Sprint Success Criteria
+
+Sprint được xem là thành công khi:
+
+* [ ] Tất cả core features hoạt động.
+* [ ] AI Scheduling hoạt động ổn định.
+* [ ] Vector Search hoạt động.
+* [ ] Dynamic Priority hoạt động.
+* [ ] Gamification hoạt động.
+* [ ] Calendar Sync hoạt động.
+* [ ] File Upload hoạt động.
+* [ ] Không còn critical bugs.
+* [ ] UI/UX đủ chất lượng để demo.
+* [ ] Pitch Deck hoàn chỉnh.
+* [ ] Video Demo hoàn chỉnh.
+* [ ] GitHub Repository sạch và đầy đủ tài liệu.
+* [ ] Bài được submit thành công trước deadline.
+
+---
+
+## 🏁 Final Target
+
+> **29/08/2026 — Product Ready. Demo Ready. Repository Ready. Submission Complete. 🚀**
+>>>>>>> e7db44d (Full task day 1)
 
 
 
